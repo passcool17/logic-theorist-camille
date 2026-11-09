@@ -1,21 +1,17 @@
 # Revue indépendante — monde 3D (feat/lt-3d)
 
 ## Strengths
-- Unités pures testées : `zones.js`, `tiles.js`, migration save v2 (29 tests)
-- Réutilise moteur logique / quiz / contenus 2D sans duplication métier
-- three r170 vendored + import map ; SW `lt-camille-v3` ; `/simple/` conserve la 2D
+- Unités pures testées : zones, tuiles, migration save v2 (29 tests)
+- three r170 + import map ; `/simple/` conserve la 2D ; SW versionné
 - Perf adaptative (DPR/ombres) pour S20 ; QA `?qa=1&zone=z4`
 
-## Issues corrigées avant PR
-### Important
-1. **Caméra** : lerp trop agressif / offset confus → suivi stabilisé derrière Camille
-2. **Save v2** : migration explicite depuis v1 pour ne pas perdre badges/preuves
-
-### Minor (reporté)
-- Camille/JOHNNIAC low-poly (pas bake Vallée)
-- PNJ non animés
-- Arbre de preuve = piles de sphères (lisible, pas un vrai graphe spatial)
-- `overflow:hidden` global dans `style.css` racine (OK pour 3D ; 2D a sa copie `/simple/style.css`)
+## Passes visuelles (v2 caméra + décor)
+- Caméra trois-quarts éloignée (portrait dist≈18.5 / h≈12.5) ; Camille ~8–12 % hauteur
+- Évitement boîte labo pour la caméra
+- Lumière dorée fin d’après-midi, ciel shader, brouillard chaud, ACES
+- Végétation : arbres arrondis, buissons, fleurs, herbe InstancedMesh, bancs, lampadaires
+- Labo : toit, fenêtres, porte, tableau, fiches, rack JOHNNIAC
+- Camille / JOHNNIAC / PNJ plus arrondis (capsules, sphères, visages)
 
 ## Assessment
-**Ready for PR (not merge):** Yes — attendre accord Pascal avant fusion/Pages.
+**Ready for PR update (not merge):** Yes — attendre Pascal avant fusion/Pages.

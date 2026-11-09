@@ -1,16 +1,30 @@
-/** PNJ Newell, Simon, Shaw près des zones 2–3. */
+/** PNJ Newell, Simon, Shaw — capsules + têtes rondes. */
 import * as THREE from 'three';
 
-function person(color, x, z, label) {
+function person(coat, x, z, label) {
   const g = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.5, 4, 8), new THREE.MeshLambertMaterial({ color }));
-  body.position.y = 0.75;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 10), new THREE.MeshLambertMaterial({ color: 0xf0c8a8 }));
-  head.position.y = 1.3;
-  g.add(body, head);
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.26, 0.55, 6, 12), new THREE.MeshLambertMaterial({ color: coat }));
+  body.position.y = 0.85;
+  body.castShadow = true;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 14, 12), new THREE.MeshLambertMaterial({ color: 0xf0c8a8 }));
+  head.position.y = 1.42;
+  head.castShadow = true;
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), new THREE.MeshLambertMaterial({ color: 0x4a3a2a }));
+  hair.position.set(0, 1.52, -0.03);
+  hair.scale.set(1.05, 0.85, 1.0);
+  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshLambertMaterial({ color: 0x2a2218 }));
+  eyeL.position.set(-0.07, 1.44, 0.2);
+  const eyeR = eyeL.clone();
+  eyeR.position.x = 0.07;
+  const blob = new THREE.Mesh(
+    new THREE.CircleGeometry(0.4, 12),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 }),
+  );
+  blob.rotation.x = -Math.PI / 2;
+  blob.position.y = 0.02;
+  g.add(body, head, hair, eyeL, eyeR, blob);
   g.position.set(x, 0, z);
   g.userData = { label, kind: 'npc' };
-  g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   return g;
 }
 

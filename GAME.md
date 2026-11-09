@@ -3,6 +3,9 @@
 ## Concept
 Campus 3D cozy (sauge/crème) inspiré de Vallée des Maths : Camille marche en 3ᵉ personne, JOHNNIAC la suit, Newell/Simon/Shaw sont des PNJ. Cinq zones = cinq chapitres. La 2D reste en `/simple/`.
 
+## Caméra
+Trois-quarts éloignée (portrait dist≈26, hauteur≈16.5) : Camille ≈8–12 % de la hauteur. Évite le labo.
+
 ## Contrôles 3D
 - WASD / flèches, joystick tactile
 - `E` / bouton E : interagir (zone ou PNJ)
