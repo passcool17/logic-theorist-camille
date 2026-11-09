@@ -37,7 +37,7 @@ function _pretty(f, prec) {
       return prec > 1 ? `(${s})` : s;
     }
     case 'imp': {
-      const s = `${_pretty(f.left, 2)} ⊃ ${_pretty(f.right, 1)}`;
+      const s = `${_pretty(f.left, 2)} ⊃ ${_pretty(f.right, 2)}`;
       return prec > 1 ? `(${s})` : s;
     }
     default:
