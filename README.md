@@ -1,33 +1,36 @@
 # Logic Theorist · Camille
 
-Jeu web éducatif sur **Logic Theorist** (1955–56, Newell, Simon, Shaw).
+Jeu web éducatif pour découvrir **Logic Theorist** (1955–56, Newell, Simon, Shaw) — le programme qui raisonne plutôt que de seulement calculer.
 
-- **Monde 3D** (accueil) : petit campus labo 1955, five zones, JOHNNIAC, PNJ.
-- **Version simple 2D** : [/simple/](./simple/) — mêmes chapitres, panneau tactile.
+Fait pour **Camille** (13 ans) : français québécois chaleureux, mobile d’abord, couleurs sauge et crème, cinq chapitres courts.
 
 **Jouer :** https://passcool17.github.io/logic-theorist-camille/
 
-## Local
+## Lancer en local
 
 ```bash
 npm test
 npm run serve   # http://localhost:8891
 ```
 
-three.js r170 via import map (`vendor/three.module.min.js`), sans étape de build.
+Aucun build. HTML / CSS / JS modules ES.
 
-## QA rapide chapitre 4 (3D)
+## Contenu
 
-```
-/?qa=1&zone=z4&autostart=1
-```
+1. Une machine qui raisonne  
+2. L’atelier de 1955 (fiches, simulation humaine, JOHNNIAC)  
+3. Les règles (substitution, modus ponens, raccourci)  
+4. Prouve comme LT — 6 preuves accessibles du ch. 2 des Principia + arbre visuel  
+5. Pourquoi c’est important (38/52, *2.85, Dartmouth, Principia pour 13 ans)
 
-Débloque les zones jusqu’à z4 et spawn près du socle de preuves.
+## Version 3D
+
+La version campus 3D a été **retirée du site le 2026-11-09** à la demande de Pascal. Le code 3D reste dans l’historique git et sur la branche `feat/lt-3d`. L’accueil et `/simple/` servent la version 2D.
+
+## Licence du code de ce dépôt
+
+Code et textes originaux de ce jeu. **Ne copie pas** `dmoews/logic-theorist` ni `jeffshrager/IPL-V` (pas de licence claire) : on s’inspire seulement des idées historiques.
 
 ## Sauvegarde
 
-Clé `lt.camille.v1`, schéma **v2** (migration auto depuis v1) : `zones`, `pos`, `completed`, `proofs`, `badges`.
-
-## Licence
-
-Code original. Pas de copie de `dmoews/logic-theorist` ni `jeffshrager/IPL-V`.
+`localStorage` clé `lt.camille.v1` (progression 2D conservée ; les saves v2 de l’ère 3D sont migrées). PWA avec service worker versionné (`lt-camille-v7`).

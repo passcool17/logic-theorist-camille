@@ -1,20 +1,10 @@
 /* Service worker versionné — change CACHE pour invalider l’ancien cache. */
-const CACHE = 'lt-camille-v6';
+const CACHE = 'lt-camille-v7';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=lt-camille-v6',
-  './js/3d/main.js?v=lt-camille-v6',
-  './js/3d/world.js',
-  './js/3d/player.js',
-  './js/3d/input.js',
-  './js/3d/perf.js',
-  './js/3d/zones.js',
-  './js/3d/tiles.js',
-  './js/3d/npcs.js',
-  './js/3d/panel.js',
-  './js/3d/proof-view.js',
-  './js/3d/camera.js',
+  './style.css?v=lt-camille-v7',
+  './js/main.js?v=lt-camille-v7',
   './js/save.js',
   './js/quiz.js',
   './js/chapters.js',
@@ -22,10 +12,7 @@ const ASSETS = [
   './js/logic/formula.js',
   './js/logic/engine.js',
   './js/logic/proofs.js',
-  './js/app2d.js',
   './simple/index.html',
-  './simple/style.css?v=lt-camille-v6',
-  './vendor/three.module.min.js',
   './favicon.svg',
   './manifest.webmanifest',
 ];
@@ -34,7 +21,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
-      await Promise.all(ASSETS.map((url) => cache.add(url).catch(() => undefined)));
+      await Promise.all(
+        ASSETS.map((url) => cache.add(url).catch(() => undefined)),
+      );
       await self.skipWaiting();
     })(),
   );

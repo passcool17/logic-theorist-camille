@@ -1,32 +1,34 @@
 # GAME.md — Logic Theorist Camille
 
 ## Concept
-Campus 3D cozy (sauge/crème) inspiré de Vallée des Maths : Camille marche en 3ᵉ personne, JOHNNIAC la suit, Newell/Simon/Shaw sont des PNJ. Cinq zones = cinq chapitres. La 2D reste en `/simple/`.
+Camille apprend Logic Theorist en cinq chapitres calmes. Le chapitre 4 est un mini-atelier de preuves avec un robot JOHNNIAC, un arbre de recherche et des tuiles de règles.
 
-## Caméra
-Trois-quarts stable (pitch borné ≈18°, portrait dist≈20) : pas de plongée verticale. Toits du labo en fondu s’ils occultent Camille. En ch.4, arbre agrandi et caméra cadrée au-dessus du panneau.
+## Version publiée
+**2D seule** (racine du site). La campus 3D a été retirée le **2026-11-09** à la demande de Pascal ; le code reste dans l’historique git et sur `feat/lt-3d`. `/simple/` redirige vers la racine.
 
-## Contrôles 3D
-- WASD / flèches, joystick tactile
-- `E` / bouton E : interagir (zone ou PNJ)
-- Chapitre 4 : hub de preuves ; panneau compact (≤34 % hauteur, ≤28 % une fois réussie) avec « Preuve trouvée ! / Continuer » épinglé en bas (sans défiler) ; arbre 3D agrandi au-dessus du panneau ; tuiles Substitution / Modus ponens / Raccourci
+## Contrôles
+- Toucher / cliquer les cartes de chapitre
+- Quiz (ch. 1, 2, 3, 5) : un mauvais choix laisse réessayer tout de suite (« Réessaie ») ; la bonne réponse débloque Continuer / Terminer
+- Chapitre 3 : toucher les trois tuiles au moins une fois
+- Chapitre 4 : un seul toucher sur Substitution / Modus ponens / Raccourci applique la prochaine étape guidée (la machine choisit les lignes) ; indices sans pénalité
 
-## Contrôles 2D (`/simple/`)
-- Cartes de chapitre, quiz avec réessai (« Réessaie »), tuiles ch.3, preuves guidées
-
-## Progression
-Zones séquentielles (`js/3d/zones.js`). Save v2 avec migration v1. Badges inchangés + déblocage de zones.
-
-## Performance
-`js/3d/perf.js` : DPR plafonné, paliers adaptatifs (ombres coupées si FPS bas). Pensé Samsung S20.
-
-## QA
-`/?qa=1&zone=z4&autostart=1` — aller vite au chapitre 4.
+## État (save)
+```
+lt.camille.v1 = {
+  v: 1,
+  chapter, completed, proofs, badges, helpUsed, settings, updatedAt
+}
+```
+Les sauvegardes `v: 2` (ère 3D) sont acceptées : `completed` / `proofs` / `badges` sont conservés.
 
 ## Cache PWA
-`lt-camille-v6`
+Service worker `lt-camille-v7` (incrémenter `CACHE` + `?v=` dans `index.html` / `sw.js` à chaque livraison jouable). L’activate supprime les anciens caches (`lt-camille-v1`…`v6`).
 
-## Prochaines idées
-- Mode libre sur les lignes de preuve
-- Camille plus détaillée (bake)
-- Sons d’atelier doux
+## Moteur
+`js/logic/` — formules ∨ ¬ ⊃, substitution, détachement, chaînage. `js/quiz.js` — réessai quiz. Tests Node obligatoires. Les 6 preuves de `proofs.js` doivent rester `checkProof`-valides.
+
+## Prochaines idées (non promises)
+- Mode libre (choisir les lignes à la main, pas seulement guidé)
+- Plus de théorèmes Principia
+- Portrait JOHNNIAC illustré
+- Mode « simulation fiches » coopératif

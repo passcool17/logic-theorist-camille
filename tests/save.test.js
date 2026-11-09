@@ -9,9 +9,7 @@ import {
   progressSummary,
   migrateSave,
   SAVE_KEY,
-  SAVE_VERSION,
 } from '../js/save.js';
-import { isZoneUnlocked } from '../js/3d/zones.js';
 
 function memStorage() {
   const map = new Map();
@@ -23,11 +21,10 @@ function memStorage() {
 }
 
 describe('save', () => {
-  it('defaultSave versionné v2 avec z1', () => {
+  it('defaultSave versionné', () => {
     const s = defaultSave();
-    assert.equal(s.v, SAVE_VERSION);
+    assert.equal(s.v, 1);
     assert.equal(s.chapter, 1);
-    assert.equal(s.zones.z1, true);
   });
 
   it('écriture et lecture', () => {
@@ -39,7 +36,6 @@ describe('save', () => {
     const { save: loaded } = loadSave(storage);
     assert.equal(loaded.completed.ch1, true);
     assert.ok(loaded.badges.includes('ch-ch1'));
-    assert.equal(isZoneUnlocked(loaded, 'z2'), true);
   });
 
   it('badge logicienne après 6 preuves', () => {
@@ -49,7 +45,6 @@ describe('save', () => {
     }
     assert.ok(save.badges.includes('logicienne'));
     assert.equal(progressSummary(save).proofsDone, 6);
-    assert.equal(save.completed.ch4, true);
   });
 
   it('JSON corrompu → mémoire sûre', () => {
@@ -60,23 +55,32 @@ describe('save', () => {
     assert.equal(mode, 'memory');
   });
 
-  it('migre v1 → v2 et débloque les zones', () => {
-    const v1 = {
-      v: 1,
+  it('conserve la progression d’une sauvegarde v2 (ère 3D)', () => {
+    const v2 = {
+      v: 2,
       chapter: 3,
       completed: { ch1: true, ch2: true },
       proofs: { p208: true },
       badges: ['ch-ch1', 'ch-ch2', 'proof-p208'],
       helpUsed: {},
-      settings: {},
+      settings: { reduceMotion: true },
+      zones: { z1: true, z2: true, z3: true },
+      pos: { x: 1, z: 2 },
       updatedAt: 1,
     };
-    const m = migrateSave(v1);
-    assert.equal(m.v, 2);
-    assert.equal(isZoneUnlocked(m, 'z1'), true);
-    assert.equal(isZoneUnlocked(m, 'z2'), true);
-    assert.equal(isZoneUnlocked(m, 'z3'), true);
-    assert.equal(isZoneUnlocked(m, 'z4'), false);
+    const m = migrateSave(v2);
+    assert.equal(m.v, 1);
+    assert.equal(m.completed.ch1, true);
+    assert.equal(m.completed.ch2, true);
     assert.equal(m.proofs.p208, true);
+    assert.ok(m.badges.includes('proof-p208'));
+    assert.equal(m.settings.reduceMotion, true);
+    assert.equal(m.zones, undefined);
+
+    const storage = memStorage();
+    storage.setItem(SAVE_KEY, JSON.stringify(v2));
+    const { save } = loadSave(storage);
+    assert.equal(save.completed.ch2, true);
+    assert.equal(save.proofs.p208, true);
   });
 });
