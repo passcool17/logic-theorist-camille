@@ -1,10 +1,10 @@
 /* Service worker versionné — change CACHE pour invalider l’ancien cache. */
-const CACHE = 'lt-camille-v5';
+const CACHE = 'lt-camille-v6';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=lt-camille-v5',
-  './js/3d/main.js?v=lt-camille-v5',
+  './style.css?v=lt-camille-v6',
+  './js/3d/main.js?v=lt-camille-v6',
   './js/3d/world.js',
   './js/3d/player.js',
   './js/3d/input.js',
@@ -14,6 +14,7 @@ const ASSETS = [
   './js/3d/npcs.js',
   './js/3d/panel.js',
   './js/3d/proof-view.js',
+  './js/3d/camera.js',
   './js/save.js',
   './js/quiz.js',
   './js/chapters.js',
@@ -23,7 +24,7 @@ const ASSETS = [
   './js/logic/proofs.js',
   './js/app2d.js',
   './simple/index.html',
-  './simple/style.css?v=lt-camille-v5',
+  './simple/style.css?v=lt-camille-v6',
   './vendor/three.module.min.js',
   './favicon.svg',
   './manifest.webmanifest',

@@ -8,6 +8,7 @@ import { tryRule, RULE_LABELS } from '../logic/engine.js';
 import { eq } from '../logic/formula.js';
 import { makeArena, placeTile, TILE_LABELS } from './tiles.js';
 import { growProofTree, clearProofTree } from './proof-view.js';
+import { proofFocusY } from './camera.js';
 
 const CONTENT = { ch1: CH1, ch2: CH2, ch3: CH3, ch5: CH5 };
 
@@ -216,14 +217,23 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
     el.classList.add('proof-mode');
     const card = document.createElement('div');
     card.className = 'panel-card proof-compact';
-    const goalText = proof.goalDisplay || pretty(proof.goal);
-    card.innerHTML = `<div class="proof-goal">
-        <p class="eyebrow">Preuve ${escapeHtml(proof.code)}</p>
-        <h2 class="goal-formula">${escapeHtml(goalText)}</h2>
-      </div>`;
+    card.dataset.proofId = proof.id;
+    const done = !!(arena.done || proofLines.some((l) => eq(l.formula, proof.goal)));
+    if (done) card.classList.add('is-done');
 
-    const recent = proofLines.slice(-3);
-    const older = proofLines.slice(0, Math.max(0, proofLines.length - 3));
+    const scroll = document.createElement('div');
+    scroll.className = 'proof-scroll';
+
+    const goalText = proof.goalDisplay || pretty(proof.goal);
+    const goal = document.createElement('div');
+    goal.className = 'proof-goal';
+    goal.innerHTML = `<p class="eyebrow">Preuve ${escapeHtml(proof.code)}</p>
+        <h2 class="goal-formula">${escapeHtml(goalText)}</h2>`;
+    scroll.appendChild(goal);
+
+    // En succès : une seule ligne (le but) pour laisser l’arbre 3D au-dessus du panneau
+    const recent = done ? proofLines.slice(-1) : proofLines.slice(-3);
+    const older = done ? [] : proofLines.slice(0, Math.max(0, proofLines.length - 3));
     if (older.length) {
       const det = document.createElement('details');
       det.className = 'proof-older';
@@ -238,7 +248,7 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
         olOld.appendChild(li);
       });
       det.appendChild(olOld);
-      card.appendChild(det);
+      scroll.appendChild(det);
     }
 
     const tree = document.createElement('ol');
@@ -251,52 +261,58 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
         <span class="line-rule">${escapeHtml(line.rule === 'donné' ? (line.note || 'donné') : (RULE_LABELS[line.rule] || line.rule))}</span>`;
       tree.appendChild(li);
     });
-    card.appendChild(tree);
+    scroll.appendChild(tree);
 
-    const row = document.createElement('div');
-    row.className = 'tile-row';
-    for (const id of ['substitution', 'detachment', 'chain']) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'rule-tile';
-      b.textContent = TILE_LABELS[id];
-      b.onclick = () => applyTile(id);
-      row.appendChild(b);
+    if (!done) {
+      const row = document.createElement('div');
+      row.className = 'tile-row';
+      for (const id of ['substitution', 'detachment', 'chain']) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'rule-tile';
+        b.textContent = TILE_LABELS[id];
+        b.onclick = () => applyTile(id);
+        row.appendChild(b);
+      }
+      scroll.appendChild(row);
     }
-    card.appendChild(row);
 
-    if (message) {
+    if (message && !done) {
       const fb = document.createElement('p');
       fb.className = 'feedback compact';
       fb.textContent = message;
-      card.appendChild(fb);
+      scroll.appendChild(fb);
     }
 
-    const help = document.createElement('div');
-    help.className = 'helpbar';
-    const hint = document.createElement('button');
-    hint.className = 'ghost';
-    hint.textContent = hintLevel === 0 ? 'Indice' : hintLevel === 1 ? 'Réponse' : 'Aide';
-    hint.onclick = () => {
-      hintLevel = Math.min(2, hintLevel + 1);
-      const step = proof.solution[arena.step];
-      if (hintLevel === 1) {
-        message = `Indice : ${proof.hints[Math.min(arena.step, proof.hints.length - 1)]}`;
-      } else if (step) {
-        message = `Réponse : « ${TILE_LABELS[step.rule]} ». ${step.note || ''}`;
-      }
-      render();
-    };
-    const close = document.createElement('button');
-    close.className = 'ghost';
-    close.textContent = 'Fermer';
-    close.onclick = hide;
-    help.append(hint, close);
-    card.appendChild(help);
+    if (!done) {
+      const help = document.createElement('div');
+      help.className = 'helpbar';
+      const hint = document.createElement('button');
+      hint.className = 'ghost';
+      hint.textContent = hintLevel === 0 ? 'Indice' : hintLevel === 1 ? 'Réponse' : 'Aide';
+      hint.onclick = () => {
+        hintLevel = Math.min(2, hintLevel + 1);
+        const step = proof.solution[arena.step];
+        if (hintLevel === 1) {
+          message = `Indice : ${proof.hints[Math.min(arena.step, proof.hints.length - 1)]}`;
+        } else if (step) {
+          message = `Réponse : « ${TILE_LABELS[step.rule]} ». ${step.note || ''}`;
+        }
+        render();
+      };
+      const close = document.createElement('button');
+      close.className = 'ghost';
+      close.textContent = 'Fermer';
+      close.onclick = hide;
+      help.append(hint, close);
+      scroll.appendChild(help);
+    }
 
-    if (arena.done || proofLines.some((l) => eq(l.formula, proof.goal))) {
+    card.appendChild(scroll);
+
+    if (done) {
       const ok = document.createElement('div');
-      ok.className = 'ok-banner compact';
+      ok.className = 'ok-banner compact proof-footer';
       ok.innerHTML = '<strong>Preuve trouvée !</strong> ';
       const doneBtn = document.createElement('button');
       doneBtn.className = 'primary';
@@ -374,7 +390,10 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
     get mode() { return mode; },
     /** Point d’intérêt caméra pendant une preuve (socle / arbre). */
     get focus() {
-      if (mode === 'proof' || mode === 'hub') return { x: 8.5, y: 1.2, z: -7.8 };
+      if (mode === 'proof' || mode === 'hub') {
+        const n = mode === 'proof' ? proofLines.length : 2;
+        return { x: 9.6, y: proofFocusY(n), z: -7.3 };
+      }
       return null;
     },
   };
