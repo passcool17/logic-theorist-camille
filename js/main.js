@@ -15,8 +15,9 @@ import {
   markProofDone,
   progressSummary,
 } from './save.js';
+import { applyQuizChoice, quizCanAdvance } from './quiz.js';
 
-const APP_VERSION = 'lt-camille-v1';
+const APP_VERSION = 'lt-camille-v2';
 
 let state = {
   save: null,
@@ -24,6 +25,7 @@ let state = {
   chapterId: null,
   pageIndex: 0,
   quizAnswered: null,
+  quizWrong: null,
   tilesTried: new Set(),
   proofId: null,
   proofLines: [],
@@ -69,6 +71,7 @@ function openChapter(id) {
   state.chapterId = id;
   state.pageIndex = 0;
   state.quizAnswered = null;
+  state.quizWrong = null;
   state.tilesTried = new Set();
   state.hintLevel = 0;
   state.message = '';
@@ -86,7 +89,7 @@ function openProof(id) {
   }));
   state.proofStep = 0;
   state.hintLevel = 0;
-  state.message = 'Choisis une tuile, puis les lignes à combiner.';
+  state.message = 'Touche une tuile pour appliquer la prochaine étape (la machine s’occupe des lignes).';
   render();
 }
 
@@ -190,22 +193,20 @@ function renderChapter(root) {
   if (page.kind === 'quiz') {
     body.append(el('p', { className: 'story', text: page.question }));
     const choices = el('div', { className: 'choices' });
+    const locked = state.quizAnswered != null;
     for (const c of page.choices) {
       const selected = state.quizAnswered === c.id;
-      const show = state.quizAnswered != null;
+      const wrongMark = !locked && state.quizWrong === c.id;
       choices.append(
         el('button', {
           type: 'button',
-          className: `choice${selected ? ' selected' : ''}${show && c.ok ? ' correct' : ''}${show && selected && !c.ok ? ' wrong' : ''}`,
-          disabled: show,
+          className: `choice${selected ? ' selected' : ''}${locked && c.ok ? ' correct' : ''}${wrongMark ? ' wrong' : ''}`,
+          disabled: locked,
           onClick: () => {
-            state.quizAnswered = c.id;
-            state.message = c.ok ? page.explain : 'Pas tout à fait — regarde la bonne réponse mise en évidence.';
-            if (c.ok) {
-              /* ok */
-            } else {
-              /* highlight correct via class */
-            }
+            const r = applyQuizChoice({ choice: c, explain: page.explain });
+            state.quizAnswered = r.quizAnswered;
+            state.quizWrong = r.quizWrong;
+            state.message = r.message;
             render();
           },
         }, [c.text]),
@@ -250,6 +251,7 @@ function renderChapter(root) {
       onClick: () => {
         state.pageIndex -= 1;
         state.quizAnswered = null;
+        state.quizWrong = null;
         state.message = '';
         render();
       },
@@ -258,8 +260,7 @@ function renderChapter(root) {
 
   const canAdvance = (() => {
     if (page.kind === 'quiz') {
-      const correct = page.choices.find((c) => c.ok);
-      return state.quizAnswered === correct.id;
+      return quizCanAdvance(state.quizAnswered, page.choices);
     }
     if (page.kind === 'tiles') return state.tilesTried.size >= page.tiles.length;
     return true;
@@ -275,6 +276,7 @@ function renderChapter(root) {
         if (!last) {
           state.pageIndex += 1;
           state.quizAnswered = null;
+          state.quizWrong = null;
           state.message = '';
           state.hintLevel = 0;
           render();

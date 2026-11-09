@@ -1,10 +1,11 @@
 /* Service worker versionné — change CACHE pour invalider l’ancien cache. */
-const CACHE = 'lt-camille-v1';
+const CACHE = 'lt-camille-v2';
 const ASSETS = [
   './index.html',
-  './style.css?v=lt-camille-v1',
-  './js/main.js?v=lt-camille-v1',
+  './style.css?v=lt-camille-v2',
+  './js/main.js?v=lt-camille-v2',
   './js/save.js',
+  './js/quiz.js',
   './js/chapters.js',
   './js/chapters/content.js',
   './js/logic/formula.js',
