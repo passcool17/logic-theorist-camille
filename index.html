@@ -2,17 +2,52 @@
 <html lang="fr-CA">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#6B8F71">
-  <meta name="description" content="Jeu éducatif pour découvrir Logic Theorist (1955–56) avec Camille.">
+  <meta name="description" content="Campus 3D Logic Theorist pour Camille — Newell, Simon, Shaw.">
   <title>Logic Theorist · Camille</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="apple-touch-icon" href="./favicon.svg">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=lt-camille-v2">
+  <link rel="stylesheet" href="./style.css?v=lt-camille-v3">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.min.js"
+    }
+  }
+  </script>
 </head>
 <body>
-  <div id="app" role="application" aria-label="Logic Theorist Camille"></div>
-  <script type="module" src="./js/main.js?v=lt-camille-v2"></script>
+  <canvas id="c" aria-label="Campus Logic Theorist"></canvas>
+  <div id="hud">
+    <div class="chips">
+      <span class="chip logo">LT</span>
+      <span id="hud-progress" class="chip">0/5 · 0/6</span>
+      <span id="hud-badges" class="chip">🏅 0</span>
+    </div>
+    <div class="btns">
+      <a class="round" href="./simple/?v=lt-camille-v3" title="Version simple 2D">2D</a>
+    </div>
+  </div>
+  <div id="prompt" class="hidden"></div>
+  <div id="toasts" aria-live="polite"></div>
+  <div id="touch">
+    <div id="stick"><div id="knob"></div></div>
+    <button id="act" type="button" aria-label="Interagir">E</button>
+  </div>
+  <div id="panel" class="panel hidden" role="dialog" aria-modal="true"></div>
+  <div id="title">
+    <div class="card">
+      <p class="eyebrow">Pour Camille · 13 ans</p>
+      <h1>Logic Theorist</h1>
+      <p class="sub">Un petit campus de 1955. Marche jusqu’aux zones, parle à Newell, Simon et Shaw, et prouve avec JOHNNIAC.</p>
+      <button id="play" type="button" class="primary big">Entrer dans le campus</button>
+      <p class="keys desk">WASD / flèches · <kbd>E</kbd> interagir · <a href="./simple/?v=lt-camille-v3">version simple 2D</a></p>
+      <p class="keys mob">Joystick · bouton E · <a href="./simple/?v=lt-camille-v3">version simple 2D</a></p>
+    </div>
+  </div>
+  <noscript>Ce jeu a besoin de JavaScript.</noscript>
+  <script type="module" src="./js/3d/main.js?v=lt-camille-v3"></script>
 </body>
 </html>
