@@ -12,8 +12,11 @@ import { makePerf, IS_TOUCH } from './perf.js';
 import { makeNpcs } from './npcs.js';
 import { makePanel } from './panel.js';
 import { clearProofTree } from './proof-view.js';
+import { PROOFS } from '../logic/proofs.js';
+import { TILE_LABELS } from './tiles.js';
+import { followCamOffset, WALK_PITCH, PROOF_PITCH, proofFocusY } from './camera.js';
 
-const APP_VERSION = 'lt-camille-v5';
+const APP_VERSION = 'lt-camille-v6';
 const params = new URLSearchParams(location.search);
 
 if (params.has('fresh')) {
@@ -165,43 +168,85 @@ const input = makeInput({
 
 const perf = makePerf(renderer, sun);
 
+const _fadeRay = new THREE.Raycaster();
+const _fadeFrom = new THREE.Vector3();
+const _fadeTo = new THREE.Vector3();
+const _fadeDir = new THREE.Vector3();
+
+const _roofWorld = new THREE.Vector3();
+function updateRoofFade() {
+  const labs = world.fadeLabs || world.fadeRoofs;
+  if (!labs || !labs.length) return;
+  _fadeFrom.copy(camera.position);
+  _fadeTo.set(player.pos.x, 1.35, player.pos.z);
+  _fadeDir.copy(_fadeTo).sub(_fadeFrom);
+  const dist = _fadeDir.length();
+  if (dist < 0.4) return;
+  _fadeDir.multiplyScalar(1 / dist);
+  _fadeRay.set(_fadeFrom, _fadeDir);
+  _fadeRay.near = 0.15;
+  _fadeRay.far = Math.max(0.2, dist - 0.1);
+  const hits = _fadeRay.intersectObjects(labs, false);
+  const hitSet = new Set(hits.map((h) => h.object));
+  for (const mesh of labs) {
+    mesh.getWorldPosition(_roofWorld);
+    const camToMesh = _fadeFrom.distanceTo(_roofWorld);
+    const nearCam = camToMesh < 6;
+    const blocked = hitSet.has(mesh) || nearCam;
+    const mat = mesh.material;
+    const target = blocked ? (mesh.userData.fadeRoof ? 0.1 : 0.22) : 1;
+    mat.opacity += (target - mat.opacity) * 0.4;
+    mat.transparent = true;
+    mat.depthWrite = mat.opacity > 0.85;
+    mesh.castShadow = mat.opacity > 0.7;
+  }
+}
+
 function placeCamera(snap = false) {
   const portrait = camera.aspect < 1;
   const focus = panel.focus;
   if (focus) {
-    // Pendant une preuve : cadrer socle + arbre 3D (laisser de la place en bas pour le panneau)
-    const dist = portrait ? 14.5 : 12.0;
-    const height = portrait ? 9.5 : 8.0;
-    camTarget.set(focus.x, focus.y + 0.6, focus.z);
-    camPos.set(focus.x - 6.5, height, focus.z + dist);
+    // Preuve : caméra un peu basse qui regarde le centre/haut de l’arbre
+    // → l’arbre occupe la moitié haute, au-dessus du panneau compact.
+    camera.clearViewOffset();
+    // focus.y = hauteur locale du centre ; le groupe arbre est déjà surélevé (y≈1.6)
+    const ty = focus.y + 1.6;
+    camTarget.set(focus.x, ty + 0.4, focus.z);
+    const back = portrait ? 14.0 : 12.0;
+    const side = portrait ? -3.8 : -3.0;
+    // Un peu plus haut / loin : arbre entier dans la zone libre au-dessus du panneau
+    const camY = Math.max(3.4, ty * 0.85);
+    camPos.set(focus.x + side, camY, focus.z + back);
     if (snap) camera.position.copy(camPos);
-    else camera.position.lerp(camPos, Math.min(1, 0.12));
+    else camera.position.lerp(camPos, Math.min(1, 0.16));
     camera.lookAt(camTarget);
     return;
   }
-  const dist = portrait ? 26.0 : 18.5;
-  const height = portrait ? 16.5 : 12.5;
+  const dist = portrait ? 18.0 : 14.5;
   const yaw = player.facing + 0.55;
-  camTarget.set(player.pos.x, 0.85, player.pos.z);
-  camPos.set(
-    player.pos.x + Math.sin(yaw) * dist,
-    height,
-    player.pos.z + Math.cos(yaw) * dist,
-  );
+  camTarget.set(player.pos.x, 1.2, player.pos.z);
+  const off = followCamOffset({ dist, pitch: WALK_PITCH, yaw, targetY: 1.2 });
+  camPos.set(player.pos.x + off.x, off.y, player.pos.z + off.z);
+  // Si la caméra est au-dessus/dans le labo, pousse-la hors du bâtiment
   if (world.labBox) {
-    const tmp = camPos.clone();
-    if (world.labBox.containsPoint(tmp)) {
-      const c = world.labBox.getCenter(new THREE.Vector3());
-      const d = tmp.clone().sub(c); d.y = 0;
-      if (d.lengthSq() < 0.01) d.set(0, 0, 1);
-      d.setLength(8);
-      camPos.copy(c).add(d);
-      camPos.y = height;
+    const c = world.labBox.getCenter(new THREE.Vector3());
+    const flat = new THREE.Vector3(camPos.x - c.x, 0, camPos.z - c.z);
+    const minR = 10;
+    if (flat.length() < minR) {
+      if (flat.lengthSq() < 0.01) flat.set(Math.sin(yaw), 0, Math.cos(yaw));
+      flat.setLength(minR);
+      camPos.x = c.x + flat.x;
+      camPos.z = c.z + flat.z;
     }
   }
+  // Recalcule la hauteur pour garder le pitch même après évitement
+  const horiz = Math.hypot(camPos.x - camTarget.x, camPos.z - camTarget.z);
+  camPos.y = camTarget.y + Math.tan(WALK_PITCH) * Math.max(horiz, 10);
+  camera.clearViewOffset();
   if (snap) camera.position.copy(camPos);
-  else camera.position.lerp(camPos, Math.min(1, 0.15));
+  else camera.position.lerp(camPos, Math.min(1, 0.18));
   camera.lookAt(camTarget);
+  updateRoofFade();
 }
 
 function resize() {
@@ -209,6 +254,7 @@ function resize() {
   const h = window.innerHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / Math.max(1, h);
+  if (!panel.focus) camera.clearViewOffset();
   camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize);
@@ -288,36 +334,36 @@ if ('serviceWorker' in navigator) {
 // Expose QA helpers
 globalThis.__LT = {
   save: () => save,
+  pos: () => ({ x: player.pos.x, z: player.pos.z }),
   teleport: (zoneId) => {
     const s = zoneSpawn(zoneId);
     player.teleport(s.x, s.z);
   },
+  openProof(proofId) {
+    input.enabled = false;
+    clearProofTree(world.proofTree);
+    panel.showProof(proofId);
+  },
   quality: () => perf.quality(),
-  solveProof() {
-    // Clique programmatique des tuiles dans l'ordre via le panneau DOM
-    const btns = [...document.querySelectorAll('#panel .rule-tile')];
-    const order = ['Substitution', 'Modus ponens', 'Raccourci'];
-    // Pour p208: Substitution puis Raccourci — on clique la bonne à chaque fois
-    const clickRight = () => {
-      const labels = [...document.querySelectorAll('#panel .rule-tile')];
-      // Relis le message d'aide? Plus simple: cliquer dans l'ordre solution en lisant le feedback
-      for (const name of ['Substitution', 'Raccourci', 'Modus ponens']) {
-        const b = labels.find((x) => x.textContent === name && !x.disabled);
-        if (!b) continue;
-        b.click();
-        break;
-      }
-    };
-    clickRight();
-    setTimeout(clickRight, 250);
-    setTimeout(clickRight, 500);
-    setTimeout(clickRight, 750);
-    setTimeout(() => {
-      const close = document.querySelector('#panel button.ghost');
-      // prefer Continuer if present
-      const cont = [...document.querySelectorAll('#panel button.primary')].find(b => /Continuer|Terminer/.test(b.textContent));
-      (cont || close)?.click();
-      input.enabled = true;
-    }, 1100);
+  solveProof(opts = {}) {
+    const finish = opts.finish !== false;
+    const proofId = opts.proofId || document.querySelector('#panel .panel-card')?.dataset?.proofId;
+    const proof = PROOFS.find((p) => p.id === proofId) || PROOFS[0];
+    const steps = proof.solution.map((s) => TILE_LABELS[s.rule]);
+    steps.forEach((name, i) => {
+      setTimeout(() => {
+        const labels = [...document.querySelectorAll('#panel .rule-tile')];
+        const b = labels.find((x) => x.textContent === name);
+        b?.click();
+      }, 200 + i * 280);
+    });
+    if (finish) {
+      setTimeout(() => {
+        const close = document.querySelector('#panel button.ghost');
+        const cont = [...document.querySelectorAll('#panel button.primary')].find(b => /Continuer|Terminer/.test(b.textContent));
+        (cont || close)?.click();
+        input.enabled = true;
+      }, 200 + steps.length * 280 + 400);
+    }
   },
 };

@@ -128,16 +128,35 @@ function buildLab() {
   const lab = new THREE.Group();
   // Murs
   lab.add(at(mesh(new THREE.BoxGeometry(7.2, 3.4, 5.6), 0xe8dcc4), 0, 1.7, 0));
-  // Toit à deux pans (approximation)
-  const roofL = mesh(new THREE.BoxGeometry(7.8, 0.22, 3.2), 0x8b5a3c);
+  // Toit à deux pans — matériaux propres pour fondu d’occlusion caméra
+  const roofL = new THREE.Mesh(
+    new THREE.BoxGeometry(7.8, 0.22, 3.2),
+    new THREE.MeshLambertMaterial({ color: 0x8b5a3c, transparent: true, opacity: 1 }),
+  );
   roofL.position.set(0, 3.55, -1.2);
   roofL.rotation.x = 0.28;
-  const roofR = mesh(new THREE.BoxGeometry(7.8, 0.22, 3.2), 0x9a6545);
+  roofL.castShadow = true;
+  roofL.receiveShadow = true;
+  roofL.userData.fadeRoof = true;
+  const roofR = new THREE.Mesh(
+    new THREE.BoxGeometry(7.8, 0.22, 3.2),
+    new THREE.MeshLambertMaterial({ color: 0x9a6545, transparent: true, opacity: 1 }),
+  );
   roofR.position.set(0, 3.55, 1.2);
   roofR.rotation.x = -0.28;
-  lab.add(roofL, roofR);
-  // Faîte
-  lab.add(at(mesh(new THREE.BoxGeometry(7.9, 0.15, 0.35), 0x6b4030), 0, 3.95, 0));
+  roofR.castShadow = true;
+  roofR.receiveShadow = true;
+  roofR.userData.fadeRoof = true;
+  const ridge = new THREE.Mesh(
+    new THREE.BoxGeometry(7.9, 0.15, 0.35),
+    new THREE.MeshLambertMaterial({ color: 0x6b4030, transparent: true, opacity: 1 }),
+  );
+  ridge.position.set(0, 3.95, 0);
+  ridge.castShadow = true;
+  ridge.receiveShadow = true;
+  ridge.userData.fadeRoof = true;
+  lab.add(roofL, roofR, ridge);
+  lab.userData.fadeRoofs = [roofL, roofR, ridge];
   // Porte
   lab.add(at(mesh(new THREE.BoxGeometry(1.35, 2.2, 0.12), 0x5a3a28), 0, 1.1, 2.82));
   lab.add(at(mesh(new THREE.SphereGeometry(0.05, 8, 8), 0xd4af37, { noShadow: true }), 0.45, 1.1, 2.9));
@@ -201,7 +220,22 @@ export function buildWorld(scene) {
   plaza.castShadow = false;
   root.add(plaza);
 
-  root.add(buildLab());
+  const lab = buildLab();
+  root.add(lab);
+  const fadeRoofs = lab.userData.fadeRoofs || [];
+  // Tous les meshes du labo peuvent s’occulter → fondu (matériaux clonés)
+  const fadeLabs = [];
+  lab.traverse((obj) => {
+    if (!obj.isMesh) return;
+    if (!obj.userData.fadeRoof) {
+      const prev = obj.material;
+      obj.material = prev.clone();
+      obj.material.transparent = true;
+      obj.material.opacity = 1;
+    }
+    obj.userData.fadeLab = true;
+    fadeLabs.push(obj);
+  });
 
   // Végétation
   const treeSpots = [
@@ -259,7 +293,7 @@ export function buildWorld(scene) {
   }
 
   const proofTree = new THREE.Group();
-  proofTree.position.set(9.6, 0, -7.3);
+  proofTree.position.set(9.6, 1.6, -7.3);
   root.add(proofTree);
 
   function walkable(x, z) {
@@ -288,7 +322,7 @@ export function buildWorld(scene) {
 
   return {
     root, pads, markers, pedestal, tileSlots, proofTree,
-    walkable, refreshLocks, labBox,
+    walkable, refreshLocks, labBox, fadeRoofs, fadeLabs, lab,
   };
 }
 

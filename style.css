@@ -444,13 +444,32 @@ kbd {
   pointer-events: auto;
 }
 .panel-card.proof-compact {
-  max-height: 40vh;
+  max-height: 34vh;
   width: min(480px, 100%);
   padding: 10px 12px 12px;
   margin-bottom: 4px;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   background: color-mix(in srgb, var(--card) 94%, transparent);
   backdrop-filter: blur(6px);
+}
+.panel-card.proof-compact.is-done {
+  max-height: 24vh;
+}
+.proof-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+.ok-banner.compact.proof-footer {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  margin-top: 8px;
+  z-index: 2;
+  background: color-mix(in srgb, var(--card) 96%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--sage) 30%, white);
 }
 .proof-goal {
   margin-bottom: 6px;
@@ -482,5 +501,6 @@ kbd {
 .panel.proof-mode .tile-row { margin: 6px 0; }
 .panel.proof-mode .helpbar { margin: 4px 0 0; }
 @media (min-height: 800px) and (max-width: 500px) {
-  .panel-card.proof-compact { max-height: 38vh; }
+  .panel-card.proof-compact { max-height: 32vh; }
+  .panel-card.proof-compact.is-done { max-height: 22vh; }
 }
