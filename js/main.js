@@ -17,7 +17,7 @@ import {
 } from './save.js';
 import { applyQuizChoice, quizCanAdvance } from './quiz.js';
 
-const APP_VERSION = 'lt-camille-v2';
+const APP_VERSION = 'lt-camille-v7';
 
 let state = {
   save: null,

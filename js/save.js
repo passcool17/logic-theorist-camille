@@ -1,63 +1,36 @@
-/** Sauvegarde locale versionnée — lt.camille.v1 (clé inchangée), schéma v2. */
-
-import { ZONES, afterChapterComplete } from './3d/zones.js';
+/** Sauvegarde locale versionnée — lt.camille.v1 (clé inchangée). */
 
 export const SAVE_KEY = 'lt.camille.v1';
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 1;
 
 export function defaultSave() {
   return {
     v: SAVE_VERSION,
     chapter: 1,
-    completed: {},
-    proofs: {},
-    badges: [],
+    completed: {}, // { ch1: true, ... }
+    proofs: {}, // { p208: true, ... }
+    badges: [], // ids
     helpUsed: {},
     settings: { reduceMotion: false },
-    zones: { z1: true },
-    pos: { x: 0, z: 4 },
     updatedAt: Date.now(),
   };
 }
 
-/** Migre v1 → v2 (zones déduites des chapitres complétés). */
+/** Normalise v1 ou v2 (ère 3D) en sauvegarde 2D, sans perdre completed/proofs/badges. */
 export function migrateSave(data) {
   if (!data || typeof data !== 'object') return defaultSave();
-  if (data.v === SAVE_VERSION) {
-    return {
-      ...defaultSave(),
-      ...data,
-      completed: data.completed || {},
-      proofs: data.proofs || {},
-      badges: Array.isArray(data.badges) ? data.badges : [],
-      helpUsed: data.helpUsed || {},
-      settings: { ...defaultSave().settings, ...(data.settings || {}) },
-      zones: data.zones && typeof data.zones === 'object' ? { z1: true, ...data.zones } : { z1: true },
-      pos: data.pos && Number.isFinite(data.pos.x) ? data.pos : defaultSave().pos,
-      v: SAVE_VERSION,
-    };
-  }
-  if (data.v === 1) {
-    let save = {
-      ...defaultSave(),
-      ...data,
-      v: SAVE_VERSION,
-      completed: data.completed || {},
-      proofs: data.proofs || {},
-      badges: Array.isArray(data.badges) ? data.badges : [],
-      helpUsed: data.helpUsed || {},
-      settings: { ...defaultSave().settings, ...(data.settings || {}) },
-      zones: { z1: true },
-      pos: defaultSave().pos,
-    };
-    for (const z of ZONES) {
-      if (save.completed[z.chapterId]) {
-        save = afterChapterComplete({ ...save, completed: save.completed }, z.chapterId);
-      }
-    }
-    return save;
-  }
-  return defaultSave();
+  if (data.v !== 1 && data.v !== 2) return defaultSave();
+  return {
+    ...defaultSave(),
+    chapter: Number.isFinite(data.chapter) ? data.chapter : 1,
+    completed: data.completed && typeof data.completed === 'object' ? data.completed : {},
+    proofs: data.proofs && typeof data.proofs === 'object' ? data.proofs : {},
+    badges: Array.isArray(data.badges) ? data.badges : [],
+    helpUsed: data.helpUsed && typeof data.helpUsed === 'object' ? data.helpUsed : {},
+    settings: { ...defaultSave().settings, ...(data.settings || {}) },
+    v: SAVE_VERSION,
+    updatedAt: data.updatedAt || Date.now(),
+  };
 }
 
 export function loadSave(storage = globalThis.localStorage) {
@@ -73,7 +46,16 @@ export function loadSave(storage = globalThis.localStorage) {
 }
 
 export function writeSave(save, storage = globalThis.localStorage) {
-  const payload = { ...save, v: SAVE_VERSION, updatedAt: Date.now() };
+  const payload = {
+    v: SAVE_VERSION,
+    chapter: save.chapter,
+    completed: save.completed || {},
+    proofs: save.proofs || {},
+    badges: Array.isArray(save.badges) ? save.badges : [],
+    helpUsed: save.helpUsed || {},
+    settings: { ...defaultSave().settings, ...(save.settings || {}) },
+    updatedAt: Date.now(),
+  };
   if (!storage) return { ok: false, mode: 'memory', save: payload };
   try {
     storage.setItem(SAVE_KEY, JSON.stringify(payload));
@@ -87,11 +69,7 @@ export function markChapterDone(save, chapterId) {
   const completed = { ...save.completed, [chapterId]: true };
   const badges = new Set(save.badges);
   badges.add(`ch-${chapterId}`);
-  let next = { ...save, completed, badges: [...badges] };
-  next = afterChapterComplete(next, chapterId);
-  const meta = { ch1: 1, ch2: 2, ch3: 3, ch4: 4, ch5: 5 }[chapterId];
-  if (meta) next.chapter = Math.min(5, meta + 1);
-  return next;
+  return { ...save, completed, badges: [...badges] };
 }
 
 export function markProofDone(save, proofId) {
@@ -100,11 +78,7 @@ export function markProofDone(save, proofId) {
   badges.add(`proof-${proofId}`);
   const all = ['p208', 'p202', 'p201', 'p205', 'p206', 'p285'];
   if (all.every((id) => proofs[id])) badges.add('logicienne');
-  let next = { ...save, proofs, badges: [...badges] };
-  if (all.every((id) => proofs[id])) {
-    next = markChapterDone(next, 'ch4');
-  }
-  return next;
+  return { ...save, proofs, badges: [...badges] };
 }
 
 export function progressSummary(save) {
