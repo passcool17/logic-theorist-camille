@@ -9,7 +9,7 @@ Trois-quarts éloignée (portrait dist≈26, hauteur≈16.5) : Camille ≈8–12
 ## Contrôles 3D
 - WASD / flèches, joystick tactile
 - `E` / bouton E : interagir (zone ou PNJ)
-- Chapitre 4 : hub de preuves → tuiles Substitution / Modus ponens / Raccourci (un toucher = une étape) ; l’arbre 3D pousse dans la salle
+- Chapitre 4 : hub de preuves ; panneau compact (≤40 % hauteur mobile) pour laisser voir l’arbre 3D ; caméra cadrée sur le socle → tuiles Substitution / Modus ponens / Raccourci (un toucher = une étape) ; l’arbre 3D pousse dans la salle
 
 ## Contrôles 2D (`/simple/`)
 - Cartes de chapitre, quiz avec réessai (« Réessaie »), tuiles ch.3, preuves guidées
@@ -24,7 +24,7 @@ Zones séquentielles (`js/3d/zones.js`). Save v2 avec migration v1. Badges incha
 `/?qa=1&zone=z4&autostart=1` — aller vite au chapitre 4.
 
 ## Cache PWA
-`lt-camille-v3`
+`lt-camille-v5`
 
 ## Prochaines idées
 - Mode libre sur les lignes de preuve

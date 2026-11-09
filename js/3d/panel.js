@@ -28,6 +28,7 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
   function hide() {
     mode = null;
     el.classList.add('hidden');
+    el.classList.remove('proof-mode');
     el.innerHTML = '';
     onClose && onClose();
   }
@@ -212,19 +213,42 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
   }
 
   function renderProof() {
+    el.classList.add('proof-mode');
     const card = document.createElement('div');
-    card.className = 'panel-card wide';
-    card.innerHTML = `<p class="eyebrow">Preuve ${escapeHtml(proof.code)}</p>
-      <h2>${escapeHtml(proof.goalDisplay || pretty(proof.goal))}</h2>
-      <p class="story">${escapeHtml(proof.blurb)}</p>`;
+    card.className = 'panel-card proof-compact';
+    const goalText = proof.goalDisplay || pretty(proof.goal);
+    card.innerHTML = `<div class="proof-goal">
+        <p class="eyebrow">Preuve ${escapeHtml(proof.code)}</p>
+        <h2 class="goal-formula">${escapeHtml(goalText)}</h2>
+      </div>`;
+
+    const recent = proofLines.slice(-3);
+    const older = proofLines.slice(0, Math.max(0, proofLines.length - 3));
+    if (older.length) {
+      const det = document.createElement('details');
+      det.className = 'proof-older';
+      const sum = document.createElement('summary');
+      sum.textContent = `Lignes 0–${older.length - 1} (${older.length})`;
+      det.appendChild(sum);
+      const olOld = document.createElement('ol');
+      olOld.className = 'tree-lines compact';
+      older.forEach((line, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="line-idx">(${i})</span> <code>${escapeHtml(pretty(line.formula))}</code>`;
+        olOld.appendChild(li);
+      });
+      det.appendChild(olOld);
+      card.appendChild(det);
+    }
 
     const tree = document.createElement('ol');
-    tree.className = 'tree-lines';
-    proofLines.forEach((line, i) => {
+    tree.className = 'tree-lines compact';
+    recent.forEach((line, j) => {
+      const i = proofLines.length - recent.length + j;
       const li = document.createElement('li');
       if (eq(line.formula, proof.goal)) li.classList.add('goal-hit');
       li.innerHTML = `<span class="line-idx">(${i})</span> <code>${escapeHtml(pretty(line.formula))}</code>
-        <span class="line-rule">${escapeHtml(line.rule === 'donné' ? line.note || 'donné' : RULE_LABELS[line.rule] || line.rule)}</span>`;
+        <span class="line-rule">${escapeHtml(line.rule === 'donné' ? (line.note || 'donné') : (RULE_LABELS[line.rule] || line.rule))}</span>`;
       tree.appendChild(li);
     });
     card.appendChild(tree);
@@ -243,7 +267,7 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
 
     if (message) {
       const fb = document.createElement('p');
-      fb.className = 'feedback';
+      fb.className = 'feedback compact';
       fb.textContent = message;
       card.appendChild(fb);
     }
@@ -252,7 +276,7 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
     help.className = 'helpbar';
     const hint = document.createElement('button');
     hint.className = 'ghost';
-    hint.textContent = hintLevel === 0 ? 'Indice' : hintLevel === 1 ? 'Montrer la réponse' : 'Aide ouverte';
+    hint.textContent = hintLevel === 0 ? 'Indice' : hintLevel === 1 ? 'Réponse' : 'Aide';
     hint.onclick = () => {
       hintLevel = Math.min(2, hintLevel + 1);
       const step = proof.solution[arena.step];
@@ -272,8 +296,8 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
 
     if (arena.done || proofLines.some((l) => eq(l.formula, proof.goal))) {
       const ok = document.createElement('div');
-      ok.className = 'ok-banner';
-      ok.innerHTML = '<strong>Preuve trouvée !</strong>';
+      ok.className = 'ok-banner compact';
+      ok.innerHTML = '<strong>Preuve trouvée !</strong> ';
       const doneBtn = document.createElement('button');
       doneBtn.className = 'primary';
       doneBtn.textContent = 'Continuer';
@@ -347,5 +371,11 @@ export function makePanel({ root, onClose, onChapterDone, onProofDone, getProofT
     showProof,
     showProofHub,
     get open() { return mode != null; },
+    get mode() { return mode; },
+    /** Point d’intérêt caméra pendant une preuve (socle / arbre). */
+    get focus() {
+      if (mode === 'proof' || mode === 'hub') return { x: 8.5, y: 1.2, z: -7.8 };
+      return null;
+    },
   };
 }

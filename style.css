@@ -432,3 +432,55 @@ button.primary.big { width: 100%; padding: 14px 18px; font-size: 1.05rem; margin
 kbd {
   background: var(--sage-soft); border-radius: 4px; padding: 1px 5px; font-size: 0.85em;
 }
+
+/* Panneau preuve compact — laisse voir l’arbre 3D */
+.panel.proof-mode {
+  background: transparent;
+  pointer-events: none;
+  place-items: end center;
+  padding-top: 0;
+}
+.panel.proof-mode .panel-card {
+  pointer-events: auto;
+}
+.panel-card.proof-compact {
+  max-height: 40vh;
+  width: min(480px, 100%);
+  padding: 10px 12px 12px;
+  margin-bottom: 4px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  backdrop-filter: blur(6px);
+}
+.proof-goal {
+  margin-bottom: 6px;
+}
+.proof-goal .eyebrow { margin-bottom: 2px; }
+.goal-formula {
+  margin: 0;
+  font-size: 1.15rem;
+  font-family: "Cambria Math", "Times New Roman", serif;
+  color: var(--sage-deep);
+}
+.tree-lines.compact { gap: 4px; }
+.tree-lines.compact li {
+  padding: 6px 8px;
+  font-size: 0.88rem;
+}
+.tree-lines.compact code { font-size: 0.95rem; }
+.proof-older {
+  margin: 4px 0 6px;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+.proof-older summary { cursor: pointer; font-weight: 650; }
+.feedback.compact { margin: 6px 0 0; padding: 6px 8px; font-size: 0.85rem; }
+.ok-banner.compact {
+  margin-top: 6px; padding: 6px 8px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.panel.proof-mode .tile-row { margin: 6px 0; }
+.panel.proof-mode .helpbar { margin: 4px 0 0; }
+@media (min-height: 800px) and (max-width: 500px) {
+  .panel-card.proof-compact { max-height: 38vh; }
+}

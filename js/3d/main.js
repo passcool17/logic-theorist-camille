@@ -13,7 +13,7 @@ import { makeNpcs } from './npcs.js';
 import { makePanel } from './panel.js';
 import { clearProofTree } from './proof-view.js';
 
-const APP_VERSION = 'lt-camille-v4';
+const APP_VERSION = 'lt-camille-v5';
 const params = new URLSearchParams(location.search);
 
 if (params.has('fresh')) {
@@ -167,6 +167,18 @@ const perf = makePerf(renderer, sun);
 
 function placeCamera(snap = false) {
   const portrait = camera.aspect < 1;
+  const focus = panel.focus;
+  if (focus) {
+    // Pendant une preuve : cadrer socle + arbre 3D (laisser de la place en bas pour le panneau)
+    const dist = portrait ? 14.5 : 12.0;
+    const height = portrait ? 9.5 : 8.0;
+    camTarget.set(focus.x, focus.y + 0.6, focus.z);
+    camPos.set(focus.x - 6.5, height, focus.z + dist);
+    if (snap) camera.position.copy(camPos);
+    else camera.position.lerp(camPos, Math.min(1, 0.12));
+    camera.lookAt(camTarget);
+    return;
+  }
   const dist = portrait ? 26.0 : 18.5;
   const height = portrait ? 16.5 : 12.5;
   const yaw = player.facing + 0.55;
@@ -188,7 +200,7 @@ function placeCamera(snap = false) {
     }
   }
   if (snap) camera.position.copy(camPos);
-  else camera.position.lerp(camPos, 1);
+  else camera.position.lerp(camPos, Math.min(1, 0.15));
   camera.lookAt(camTarget);
 }
 
