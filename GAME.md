@@ -1,30 +1,32 @@
 # GAME.md — Logic Theorist Camille
 
 ## Concept
-Camille apprend Logic Theorist en cinq chapitres calmes. Le chapitre 4 est un mini-atelier de preuves avec un robot JOHNNIAC, un arbre de recherche et des tuiles de règles.
+Campus 3D cozy (sauge/crème) inspiré de Vallée des Maths : Camille marche en 3ᵉ personne, JOHNNIAC la suit, Newell/Simon/Shaw sont des PNJ. Cinq zones = cinq chapitres. La 2D reste en `/simple/`.
 
-## Contrôles
-- Toucher / cliquer les cartes de chapitre
-- Quiz (ch. 1, 2, 3, 5) : un mauvais choix laisse réessayer tout de suite (« Réessaie ») ; la bonne réponse débloque Continuer / Terminer
-- Chapitre 3 : toucher les trois tuiles au moins une fois
-- Chapitre 4 : un seul toucher sur Substitution / Modus ponens / Raccourci applique la prochaine étape guidée (la machine choisit les lignes) ; indices sans pénalité
+## Caméra
+Trois-quarts éloignée (portrait dist≈26, hauteur≈16.5) : Camille ≈8–12 % de la hauteur. Évite le labo.
 
-## État (save)
-```
-lt.camille.v1 = {
-  v: 1,
-  chapter, completed, proofs, badges, helpUsed, settings, updatedAt
-}
-```
+## Contrôles 3D
+- WASD / flèches, joystick tactile
+- `E` / bouton E : interagir (zone ou PNJ)
+- Chapitre 4 : hub de preuves ; panneau compact (≤40 % hauteur mobile) pour laisser voir l’arbre 3D ; caméra cadrée sur le socle → tuiles Substitution / Modus ponens / Raccourci (un toucher = une étape) ; l’arbre 3D pousse dans la salle
+
+## Contrôles 2D (`/simple/`)
+- Cartes de chapitre, quiz avec réessai (« Réessaie »), tuiles ch.3, preuves guidées
+
+## Progression
+Zones séquentielles (`js/3d/zones.js`). Save v2 avec migration v1. Badges inchangés + déblocage de zones.
+
+## Performance
+`js/3d/perf.js` : DPR plafonné, paliers adaptatifs (ombres coupées si FPS bas). Pensé Samsung S20.
+
+## QA
+`/?qa=1&zone=z4&autostart=1` — aller vite au chapitre 4.
 
 ## Cache PWA
-Service worker `lt-camille-v2` (incrémenter `CACHE` + `?v=` dans `index.html` / `sw.js` à chaque livraison jouable).
+`lt-camille-v5`
 
-## Moteur
-`js/logic/` — formules ∨ ¬ ⊃, substitution, détachement, chaînage. `js/quiz.js` — réessai quiz. Tests Node obligatoires. Les 6 preuves de `proofs.js` doivent rester `checkProof`-valides.
-
-## Prochaines idées (non promises)
-- Mode libre (choisir les lignes à la main, pas seulement guidé)
-- Plus de théorèmes Principia
-- Portrait JOHNNIAC illustré
-- Mode « simulation fiches » coopératif
+## Prochaines idées
+- Mode libre sur les lignes de preuve
+- Camille plus détaillée (bake)
+- Sons d’atelier doux

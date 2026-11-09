@@ -1,32 +1,33 @@
 # Logic Theorist · Camille
 
-Jeu web éducatif pour découvrir **Logic Theorist** (1955–56, Newell, Simon, Shaw) — le programme qui raisonne plutôt que de seulement calculer.
+Jeu web éducatif sur **Logic Theorist** (1955–56, Newell, Simon, Shaw).
 
-Fait pour **Camille** (13 ans) : français québécois chaleureux, mobile d’abord, couleurs sauge et crème, cinq chapitres courts.
+- **Monde 3D** (accueil) : petit campus labo 1955, five zones, JOHNNIAC, PNJ.
+- **Version simple 2D** : [/simple/](./simple/) — mêmes chapitres, panneau tactile.
 
 **Jouer :** https://passcool17.github.io/logic-theorist-camille/
 
-## Lancer en local
+## Local
 
 ```bash
 npm test
 npm run serve   # http://localhost:8891
 ```
 
-Aucun build. HTML / CSS / JS modules ES.
+three.js r170 via import map (`vendor/three.module.min.js`), sans étape de build.
 
-## Contenu
+## QA rapide chapitre 4 (3D)
 
-1. Une machine qui raisonne  
-2. L’atelier de 1955 (fiches, simulation humaine, JOHNNIAC)  
-3. Les règles (substitution, modus ponens, raccourci)  
-4. Prouve comme LT — 6 preuves accessibles du ch. 2 des Principia + arbre visuel  
-5. Pourquoi c’est important (38/52, *2.85, Dartmouth, Principia pour 13 ans)
+```
+/?qa=1&zone=z4&autostart=1
+```
 
-## Licence du code de ce dépôt
-
-Code et textes originaux de ce jeu. **Ne copie pas** `dmoews/logic-theorist` ni `jeffshrager/IPL-V` (pas de licence claire) : on s’inspire seulement des idées historiques.
+Débloque les zones jusqu’à z4 et spawn près du socle de preuves.
 
 ## Sauvegarde
 
-`localStorage` clé `lt.camille.v1`. PWA avec service worker versionné (`lt-camille-v1`).
+Clé `lt.camille.v1`, schéma **v2** (migration auto depuis v1) : `zones`, `pos`, `completed`, `proofs`, `badges`.
+
+## Licence
+
+Code original. Pas de copie de `dmoews/logic-theorist` ni `jeffshrager/IPL-V`.
