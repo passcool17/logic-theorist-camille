@@ -1,10 +1,10 @@
 /* Service worker versionné — change CACHE pour invalider l’ancien cache. */
-const CACHE = 'lt-camille-v7';
+const CACHE = 'lt-camille-v8';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=lt-camille-v7',
-  './js/main.js?v=lt-camille-v7',
+  './style.css?v=lt-camille-v8',
+  './js/main.js?v=lt-camille-v8',
   './js/save.js',
   './js/quiz.js',
   './js/chapters.js',
@@ -12,6 +12,9 @@ const ASSETS = [
   './js/logic/formula.js',
   './js/logic/engine.js',
   './js/logic/proofs.js',
+  './js/proofplay.js',
+  './js/ui/art.js',
+  './js/ui/treeview.js',
   './simple/index.html',
   './favicon.svg',
   './manifest.webmanifest',
