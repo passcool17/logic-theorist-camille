@@ -22,7 +22,18 @@ const ASSETS = [
   './simple/index.html',
   './favicon.svg',
   './manifest.webmanifest',
-  // Illustrations peintes (partie A) : ajouter ici chaque ./assets/art/*.webp livré.
+  // Illustrations peintes (partie A, Atelier assets). Les icônes .svg sont en ligne dans art.js.
+  './assets/art/johnniac-hero.webp',
+  './assets/art/johnniac-head.webp',
+  './assets/art/johnniac-idle.webp',
+  './assets/art/johnniac-thinking.webp',
+  './assets/art/johnniac-happy.webp',
+  './assets/art/johnniac-oops.webp',
+  './assets/art/ch1-machine.webp',
+  './assets/art/ch2-workshop.webp',
+  './assets/art/ch3-rules.webp',
+  './assets/art/ch4-proof-workshop.webp',
+  './assets/art/ch5-why-it-matters.webp',
 ];
 
 self.addEventListener('install', (event) => {

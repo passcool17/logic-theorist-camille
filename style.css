@@ -750,3 +750,48 @@ button { touch-action: manipulation; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 html.rm *, html.rm *::before, html.rm *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+
+/* ================= v9 : illustrations peintes (Atelier assets) + polissage ================= */
+.logo { background: var(--sage-soft); overflow: hidden; }
+.logo img, .jn-head { width: 34px; height: 34px; display: block; object-fit: contain; }
+.speech-face img { width: 26px; height: 26px; display: block; }
+.jn-img { width: 100%; height: auto; display: block; }
+
+/* Accueil : JOHNNIAC en grand qui salue */
+.hero { align-items: flex-end; padding-bottom: 0; overflow: hidden; }
+.hero-art { flex: 0 0 124px; margin: -2px 0 0 -4px; }
+.hero-text { padding-bottom: 14px; align-self: center; }
+.hub-art { flex: 0 0 82px; }
+
+/* Icônes de règles (currentColor) */
+.rule-icon { color: var(--sage-deep); display: grid; place-items: center; background: var(--sage-node); border-radius: 9px; }
+.rule-icon svg { width: 22px; height: 22px; }
+.rule-tile.selected .rule-icon { background: var(--sage); color: #fff; }
+.tile-row .rule-icon { flex: 0 0 auto; width: 34px; height: 34px; }
+.chap-icon { color: var(--sage-deep); }
+.tn-icon svg { width: 16px; height: 16px; filter: none; opacity: .75; color: #666; }
+
+/* Bandeau de chapitre et carte d’entrée */
+.chapter-banner { margin: -4px -4px 12px; border-radius: 12px; overflow: hidden; background: var(--sage-node); aspect-ratio: 16 / 10; }
+.chapter-banner img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: 50% 40%; aspect-ratio: auto; }
+.ci-art { border-radius: 14px; overflow: hidden; background: var(--sage-node); aspect-ratio: 4 / 3; }
+.ci-art img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 0; }
+
+/* Scène de preuve */
+.scene-robot img { max-height: 230px; width: 100%; object-fit: contain; }
+
+/* Réponse au doigt : cartes et boutons */
+.chapter-card, .rule-tile, .line-chip, .choice, .mode-opt, .subst-opt, .switch-row, .hint-btn, button.ghost {
+  transition: transform .12s ease-out, box-shadow .15s, background-color .15s, border-color .15s;
+}
+@media (hover: hover) {
+  .chapter-card:not(:disabled):hover, .rule-tile:not(:disabled):hover, .line-chip:not(:disabled):hover, .choice:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 4px 0 rgba(60,70,50,.06), 0 10px 20px rgba(60,70,50,.1); }
+}
+.chapter-card:not(:disabled):active, .rule-tile:not(:disabled):active, .line-chip:not(:disabled):active, .choice:not(:disabled):active, .subst-opt:active, .mode-opt:active, .switch-row:active { transform: translateY(1px) scale(.99); }
+.back-btn:active, .sound-btn:active, .about-btn:active { transform: scale(.94); }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero-art { flex-basis: 110px; }
+  .page-card:has(> .chapter-banner) { display: grid; grid-template-columns: minmax(220px, 38%) 1fr; column-gap: 16px; align-items: start; }
+  .page-card > .chapter-banner { grid-row: 1 / span 20; margin: 0; aspect-ratio: 4 / 3; }
+}

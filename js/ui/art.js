@@ -63,15 +63,16 @@ export function johnniacSVG({ mood = 'smile', note = true, plants = true } = {})
 </svg>`;
 }
 
-/** Petite tête de JOHNNIAC pour le logo. */
+/** Petite tête de JOHNNIAC (logo, bulles) : image peinte 120×120 affichée ~40 px. */
 export function johnniacHeadSVG() {
-  return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="6" width="32" height="30" rx="6" fill="#e6ddc8" stroke="#8f8a7a"/><rect x="9" y="11" width="22" height="16" rx="4" fill="#2f5f7a"/><g fill="none" stroke="#dff4ff" stroke-width="2" stroke-linecap="round"><path d="M13 18 q2 -2.5 4 0"/><path d="M23 18 q2 -2.5 4 0"/><path d="M15 22 q5 4 10 0"/></g><circle cx="12" cy="31" r="1.6" fill="#e9c74a"/><circle cx="17" cy="31" r="1.6" fill="#8cc084"/><circle cx="28" cy="31" r="2" fill="#4f9a5a"/><line x1="12" y1="6" x2="12" y2="1.5" stroke="#8f8a7a" stroke-width="1.5"/></svg>`;
+  return artImg(ART.head, 'jn-head');
 }
 
+/** Icônes des règles (Atelier assets, grille 24, currentColor → suivent la couleur du texte). */
 export const RULE_ICONS = {
-  substitution: `<svg viewBox="0 0 40 40" aria-hidden="true"><path fill="#8fae86" d="M8 12h7a4 4 0 1 1 8 0h7v7a4 4 0 1 0 0 8v7h-7a4 4 0 1 1-8 0H8v-7a4 4 0 1 0 0-8z"/><path fill="#a9c39f" d="M8 12h7a4 4 0 1 1 8 0h7v5H8z" opacity=".55"/></svg>`,
-  detachment: `<svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="#4d7b95" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6v26M12 34h16M8 11h24"/><circle cx="20" cy="6" r="1.6" fill="#4d7b95"/><path d="M8 11 3 22h10zM32 11l-5 11h10z" fill="#d7e6ee"/><path d="M3 22q5 5 10 0M27 22q5 5 10 0"/></svg>`,
-  chain: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 36c2-12 22-6 22-17 0-6-8-7-6-15h7c-2 7 6 9 6 15 0 14-21 9-21 17z" fill="#7f9a72"/><path d="M14 34c3-8 20-6 20-15 0-4-6-6-5-13" fill="none" stroke="#e8e0c6" stroke-width="1.4" stroke-dasharray="2.5 2.5"/></svg>`,
+  substitution: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7" rx="2"/><circle cx="17" cy="17" r="4" fill="currentColor" fill-opacity=".2"/><path d="M14 6h3a2 2 0 0 1 2 2v2"/><path d="m17 8 2 2 2-2"/><path d="M10 18H7a2 2 0 0 1-2-2v-2"/><path d="m7 16-2-2-2 2"/></svg>`,
+  detachment: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="5" cy="12" r="3"/><path d="M9 12h6"/><path d="m12 9 3 3-3 3"/><circle cx="19.5" cy="12" r="2.5" fill="currentColor"/></svg>`,
+  chain: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="4.5" cy="17" r="2.5" fill="currentColor"/><circle cx="12" cy="17" r="2.5" fill="currentColor" fill-opacity=".35" stroke-opacity=".5"/><circle cx="19.5" cy="17" r="2.5" fill="currentColor"/><path d="M4.5 11.5Q12 1.5 19 11"/><path d="M19.33 7.62 L19 11 L15.67 10.32"/></svg>`,
 };
 
 /** Icônes des chapitres (accueil). */
@@ -112,38 +113,23 @@ export function landscapeSVG() {
 </svg>`;
 }
 
-/* ---------- Points d’accroche pour les illustrations peintes (partie A) ---------- */
+/* ---------- Illustrations peintes (partie A, Atelier assets) ---------- */
 
-/** Portrait de JOHNNIAC : image livrée si prête, sinon le SVG maison. */
-export function johnniacPortrait(opts = {}) {
-  return artImg(ART.johnniac, 'jn-img') || johnniacSVG(opts);
+/** Humeurs du jeu → images : smile→idle, think→thinking, proud→happy, oops (essai raté). */
+const MOOD_ART = { smile: 'idle', idle: 'idle', think: 'thinking', thinking: 'thinking', proud: 'happy', happy: 'happy', oops: 'oops' };
+
+/** Portrait de JOHNNIAC. `hero` = grande image de l’accueil (non différée, priorité haute). */
+export function johnniacPortrait({ mood = 'smile', hero = false } = {}) {
+  if (hero) return artImg(ART.hero, 'jn-img jn-hero', { priority: true });
+  return artImg(ART.moods[MOOD_ART[mood] || 'idle'], 'jn-img');
 }
 
-/** Icône d’une règle : image livrée si prête, sinon le SVG. */
+/** Icône d’une règle (SVG en ligne). */
 export function ruleIcon(rule) {
-  return artImg(ART.rules[rule], 'rule-img') || RULE_ICONS[rule] || '';
+  return RULE_ICONS[rule] || '';
 }
 
-const CH_TINT = {
-  ch1: ['#fbf1cf', '#f3dc8a'],
-  ch2: ['#e3eef3', '#b9d3e0'],
-  ch3: ['#e6f0dc', '#b7cfa9'],
-  ch4: ['#e2edd6', '#9dbb94'],
-  ch5: ['#fbeed6', '#f1cf8a'],
-};
-
-/** Illustration de chapitre 16:9 : image livrée si prête, sinon un décor SVG léger. */
-export function chapterArt(id) {
-  const img = artImg(ART.chapters[id], 'chapter-img');
-  if (img) return img;
-  const [a, b] = CH_TINT[id] || CH_TINT.ch4;
-  const icon = (CHAPTER_ICONS[id] || '').replace('<svg ', '<svg x="124" y="34" width="72" height="72" ');
-  return `<svg class="chapter-ph" viewBox="0 0 320 180" role="img" aria-label="${(ART.chapters[id]?.alt || '').replace(/"/g, '')}">
-  <defs><radialGradient id="g-${id}" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#fffdf6"/><stop offset=".55" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></radialGradient></defs>
-  <rect width="320" height="180" rx="18" fill="url(#g-${id})"/>
-  <path d="M0 132 Q60 112 120 126 T240 120 T320 128 V180 H0z" fill="#b5cdb3" opacity=".6"/>
-  <path d="M0 150 Q80 134 160 146 T320 142 V180 H0z" fill="#cfe0b8"/>
-  <circle cx="160" cy="70" r="50" fill="#fffcf4" opacity=".75"/>
-  ${icon}
-</svg>`;
+/** Illustration de chapitre 960×720. `lazy` pour les bandeaux, pas pour la carte d’entrée. */
+export function chapterArt(id, { lazy = true } = {}) {
+  return artImg(ART.chapters[id], 'chapter-img', { lazy });
 }

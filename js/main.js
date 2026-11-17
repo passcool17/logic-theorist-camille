@@ -113,7 +113,7 @@ function chapterCurtain(id) {
   const ch = CHAPTERS.find((c) => c.id === id);
   if (!ch) return;
   sfx('page');
-  motion.chapterIntro({ num: ch.num, title: ch.title, artHTML: chapterArt(id) });
+  motion.chapterIntro({ num: ch.num, title: ch.title, artHTML: chapterArt(id, { lazy: false }) });
 }
 
 function settings() {
@@ -276,7 +276,7 @@ function renderHome(root) {
   const sum = progressSummary(state.save);
   root.append(
     el('section', { className: 'hero card' }, [
-      el('div', { className: 'hero-art robot-idle', html: johnniacPortrait({ mood: 'smile', plants: false }) }),
+      el('div', { className: 'hero-art robot-idle', html: johnniacPortrait({ hero: true }) }),
       el('div', { className: 'hero-text' }, [
         el('p', { className: 'eyebrow', text: 'Pour Camille · 13 ans' }),
         el('h2', { className: 'hero-title', text: 'Une machine qui raisonne' }),
@@ -491,7 +491,7 @@ function renderCh4Hub(root) {
   root.append(progressBar(prog.done, prog.total, 'Étapes de preuve du chapitre 4'));
   root.append(
     el('section', { className: 'card hub-hero' }, [
-      el('div', { className: 'hub-art robot-idle', html: johnniacPortrait({ mood: 'smile', plants: false, note: false }) }),
+      el('div', { className: 'hub-art robot-idle', html: johnniacPortrait({ mood: 'smile' }) }),
       el('div', {}, [
         el('h2', { text: 'Prouve comme LT' }),
         el('p', {
@@ -599,7 +599,7 @@ function renderProof(root) {
   const stepNow = state.proofLines.length - nInit;
   const lastReject = state.proofRejects[state.proofRejects.length - 1];
   const puzzled = !done && lastReject && lastReject.at === (free ? stepNow : state.proofStep);
-  const mood = done ? 'proud' : puzzled ? 'think' : 'smile';
+  const mood = done ? 'proud' : puzzled ? 'oops' : state.hintLevel > 0 ? 'think' : 'smile';
   const offset = -((performance.now() % 4200) / 1000).toFixed(2);
   root.append(
     el('section', { className: 'scene' }, [
@@ -607,7 +607,6 @@ function renderProof(root) {
         el('div', { className: 'robot-react' }, [
           el('div', { className: 'robot-idle', style: `animation-delay:${offset}s`, html: johnniacPortrait({ mood }) }),
         ]),
-        puzzled ? el('span', { className: 'think-bubble', 'aria-hidden': 'true', text: '?' }) : null,
       ]),
       el('div', { className: 'scene-tree drop-zone' }, [tv.el]),
     ]),
@@ -1084,7 +1083,7 @@ function renderAbout(root) {
       el('h2', { text: 'À propos' }),
       el('p', {
         className: 'story',
-        text: `Jeu éducatif écrit pour Camille. Aucun code n’a été copié depuis dmoews/logic-theorist ni jeffshrager/IPL-V (dépôts sans licence claire) : moteur, textes et illustrations sont originaux, inspirés des idées historiques.`,
+        text: `Jeu éducatif écrit pour Camille. Aucun code n’a été copié depuis dmoews/logic-theorist ni jeffshrager/IPL-V (dépôts sans licence claire) : moteur et textes sont originaux, inspirés des idées historiques.`,
       }),
       el('p', {
         className: 'story',
@@ -1092,7 +1091,7 @@ function renderAbout(root) {
       }),
       el('p', {
         className: 'meta',
-        text: 'Musique : boucle générée avec MusicGen (Meta, modèle musicgen-small, licence CC BY-NC 4.0), usage non commercial. Petits sons : synthétisés dans le navigateur. Énoncés des théorèmes *2 vérifiés sur Metamath (set.mm).',
+        text: 'Illustrations : peintes pour ce jeu par le bot Atelier assets (images générées par IA ; personnages inventés). Musique : boucle générée avec MusicGen (Meta, modèle musicgen-small, licence CC BY-NC 4.0), usage non commercial. Petits sons : synthétisés dans le navigateur. Énoncés des théorèmes *2 vérifiés sur Metamath (set.mm).',
       }),
       el('p', {
         className: 'meta',

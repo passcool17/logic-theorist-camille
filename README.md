@@ -2,7 +2,7 @@
 
 Jeu web éducatif pour découvrir **Logic Theorist** (1955–56, Newell, Simon, Shaw) — le programme qui raisonne plutôt que de seulement calculer.
 
-Fait pour **Camille** (13 ans) : français québécois chaleureux, mobile d’abord, couleurs sauge et crème, cinq chapitres courts.
+Fait pour **Camille** (13 ans) : français québécois chaleureux, mobile d’abord, couleurs sauge et crème, cinq chapitres courts, illustrations peintes (JOHNNIAC et chapitres, par le bot Atelier assets, voir `GAME.md`).
 
 **Jouer :** https://passcool17.github.io/logic-theorist-camille/
 

@@ -4,21 +4,43 @@ import { existsSync, readFileSync, statSync, readdirSync } from 'node:fs';
 import { artEntries, ART } from '../js/ui/assets.js';
 import { MUSIC_URL } from '../js/audio.js';
 
+/** Taille d’un WebP (VP8X étendu ou VP8 avec perte). */
+function webpSize(buf) {
+  const kind = buf.toString('ascii', 12, 16);
+  if (kind === 'VP8X') return [1 + buf.readUIntLE(24, 3), 1 + buf.readUIntLE(27, 3)];
+  if (kind === 'VP8 ') return [buf.readUInt16LE(26) & 0x3fff, buf.readUInt16LE(28) & 0x3fff];
+  throw new Error(`WebP inattendu : ${kind}`);
+}
+
 const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 const root = new URL('../', import.meta.url);
 
 describe('illustrations et sons', () => {
-  it('9 emplacements d’art : portrait, 5 chapitres, 3 règles', () => {
-    assert.equal(artEntries().length, 9);
+  it('11 images peintes : héros, tête, 4 humeurs, 5 chapitres', () => {
+    assert.equal(artEntries().length, 11);
     assert.equal(Object.keys(ART.chapters).length, 5);
-    assert.equal(Object.keys(ART.rules).length, 3);
+    assert.deepEqual(Object.keys(ART.moods), ['idle', 'thinking', 'happy', 'oops']);
   });
 
-  it('une image « ready » existe dans assets/art et est dans le cache du service worker', () => {
+  it('chaque image existe, a sa vraie taille déclarée, et est dans le précache', () => {
+    let total = 0;
     for (const e of artEntries()) {
-      if (!e.ready) continue;
-      assert.ok(existsSync(new URL(`assets/art/${e.file}`, root)), e.file);
-      assert.ok(sw.includes(`./assets/art/${e.file}`), `sw.js : ${e.file}`);
+      const url = new URL(`assets/art/${e.file}`, root);
+      assert.ok(existsSync(url), e.file);
+      const buf = readFileSync(url);
+      const [w, h] = webpSize(buf);
+      assert.deepEqual([w, h], [e.w, e.h], e.file);
+      assert.ok(sw.includes(`'./assets/art/${e.file}'`), `sw.js : ${e.file}`);
+      total += buf.length;
+    }
+    assert.ok(total < 420_000, `${total} octets d’images`);
+  });
+
+  it('les icônes de règles sont en ligne et suivent currentColor', async () => {
+    const { RULE_ICONS } = await import('../js/ui/art.js');
+    for (const k of ['substitution', 'detachment', 'chain']) {
+      assert.match(RULE_ICONS[k], /currentColor/);
+      assert.match(RULE_ICONS[k], /aria-hidden="true"/);
     }
   });
 
