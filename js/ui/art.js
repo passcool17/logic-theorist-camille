@@ -1,3 +1,5 @@
+import { ART, artImg } from './assets.js';
+
 /**
  * Illustrations maison en SVG (aucune image externe) :
  * JOHNNIAC, icônes des règles, lauriers, ruban, brindille, paysage.
@@ -6,11 +8,13 @@
 
 /** Ordinateur rétro JOHNNIAC. mood : 'smile' | 'proud' | 'think' */
 export function johnniacSVG({ mood = 'smile', note = true, plants = true } = {}) {
-  const face = {
-    smile: '<path d="M44 66 q5 -6 10 0" /><path d="M66 66 q5 -6 10 0" /><path d="M48 80 q12 10 24 0" />',
-    proud: '<path d="M43 64 l5 5 l5 -5" /><path d="M67 64 l5 5 l5 -5" /><path d="M46 78 q14 14 28 0" /><circle cx="40" cy="76" r="3" fill="#f4a9a0" stroke="none" opacity=".8"/><circle cx="80" cy="76" r="3" fill="#f4a9a0" stroke="none" opacity=".8"/>',
-    think: '<circle cx="49" cy="66" r="3" fill="#dff4ff" stroke="none"/><circle cx="71" cy="66" r="3" fill="#dff4ff" stroke="none"/><path d="M50 82 h20" />',
-  }[mood] || '';
+  const faces = {
+    smile: ['<path d="M44 66 q5 -6 10 0" /><path d="M66 66 q5 -6 10 0" />', '<path d="M48 80 q12 10 24 0" />'],
+    proud: ['<path d="M43 64 l5 5 l5 -5" /><path d="M67 64 l5 5 l5 -5" />', '<path d="M46 78 q14 14 28 0" /><circle cx="40" cy="76" r="3" fill="#f4a9a0" stroke="none" opacity=".8"/><circle cx="80" cy="76" r="3" fill="#f4a9a0" stroke="none" opacity=".8"/>'],
+    think: ['<circle cx="49" cy="66" r="3" fill="#dff4ff" stroke="none"/><circle cx="71" cy="66" r="3" fill="#dff4ff" stroke="none"/>', '<path d="M50 82 h20" />'],
+  };
+  const [eyes, mouth] = faces[mood] || faces.smile;
+  const face = `<g class="jn-eyes">${eyes}</g>${mouth}`;
   const leaves = plants
     ? `<g fill="#9dbb94" opacity=".9">
         <path d="M6 196 q-6 -30 8 -52 q4 26 -8 52z"/><path d="M14 198 q2 -26 20 -38 q-4 24 -20 38z" fill="#b7cfa9"/>
@@ -29,7 +33,7 @@ export function johnniacSVG({ mood = 'smile', note = true, plants = true } = {})
   return `<svg class="johnniac" viewBox="0 0 130 210" role="img" aria-label="JOHNNIAC, l’ordinateur qui sourit">
   <ellipse cx="65" cy="203" rx="58" ry="6" fill="#cfd8c3" opacity=".7"/>
   ${leaves}
-  <line x1="30" y1="22" x2="30" y2="6" stroke="#8b8f86" stroke-width="2"/><circle cx="30" cy="5" r="3.5" fill="#9a9e95"/>
+  <line x1="30" y1="22" x2="30" y2="6" stroke="#8b8f86" stroke-width="2"/><circle class="jn-bulb" cx="30" cy="5" r="3.5" fill="#e9c74a"/>
   <rect x="14" y="20" width="102" height="178" rx="9" fill="#e6ddc8" stroke="#8f8a7a" stroke-width="1.5"/>
   <rect x="14" y="132" width="102" height="66" rx="6" fill="#d7ceb8" stroke="#8f8a7a" stroke-width="1.5"/>
   <rect x="36" y="26" width="58" height="12" rx="3" fill="#f6f0e0" stroke="#8f8a7a"/>
@@ -105,5 +109,41 @@ export function landscapeSVG() {
   <g fill="#8fae86" opacity=".9"><circle cx="12" cy="84" r="14"/><circle cx="30" cy="92" r="11"/><circle cx="346" cy="80" r="16"/><circle cx="326" cy="92" r="11"/></g>
   <g fill="#6b8f71" opacity=".75"><path d="M4 120 q2-34 12-46 q-1 26-6 46z"/><path d="M352 120 q-4-36-14-48 q2 28 8 48z"/></g>
   ${flowers}
+</svg>`;
+}
+
+/* ---------- Points d’accroche pour les illustrations peintes (partie A) ---------- */
+
+/** Portrait de JOHNNIAC : image livrée si prête, sinon le SVG maison. */
+export function johnniacPortrait(opts = {}) {
+  return artImg(ART.johnniac, 'jn-img') || johnniacSVG(opts);
+}
+
+/** Icône d’une règle : image livrée si prête, sinon le SVG. */
+export function ruleIcon(rule) {
+  return artImg(ART.rules[rule], 'rule-img') || RULE_ICONS[rule] || '';
+}
+
+const CH_TINT = {
+  ch1: ['#fbf1cf', '#f3dc8a'],
+  ch2: ['#e3eef3', '#b9d3e0'],
+  ch3: ['#e6f0dc', '#b7cfa9'],
+  ch4: ['#e2edd6', '#9dbb94'],
+  ch5: ['#fbeed6', '#f1cf8a'],
+};
+
+/** Illustration de chapitre 16:9 : image livrée si prête, sinon un décor SVG léger. */
+export function chapterArt(id) {
+  const img = artImg(ART.chapters[id], 'chapter-img');
+  if (img) return img;
+  const [a, b] = CH_TINT[id] || CH_TINT.ch4;
+  const icon = (CHAPTER_ICONS[id] || '').replace('<svg ', '<svg x="124" y="34" width="72" height="72" ');
+  return `<svg class="chapter-ph" viewBox="0 0 320 180" role="img" aria-label="${(ART.chapters[id]?.alt || '').replace(/"/g, '')}">
+  <defs><radialGradient id="g-${id}" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#fffdf6"/><stop offset=".55" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></radialGradient></defs>
+  <rect width="320" height="180" rx="18" fill="url(#g-${id})"/>
+  <path d="M0 132 Q60 112 120 126 T240 120 T320 128 V180 H0z" fill="#b5cdb3" opacity=".6"/>
+  <path d="M0 150 Q80 134 160 146 T320 142 V180 H0z" fill="#cfe0b8"/>
+  <circle cx="160" cy="70" r="50" fill="#fffcf4" opacity=".75"/>
+  ${icon}
 </svg>`;
 }

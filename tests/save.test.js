@@ -84,3 +84,68 @@ describe('save', () => {
     assert.equal(save.proofs.p208, true);
   });
 });
+
+describe('save v9 (réglages son / animations / mode)', () => {
+  it('une vieille sauvegarde v1 (avant v9) se charge et reçoit les nouveaux réglages', () => {
+    const old = {
+      v: 1,
+      chapter: 4,
+      completed: { ch1: true, ch2: true, ch3: true },
+      proofs: { p208: true, p202: true },
+      badges: ['ch-ch1', 'ch-ch2', 'ch-ch3', 'proof-p208', 'proof-p202'],
+      helpUsed: {},
+      settings: { reduceMotion: true },
+      updatedAt: 1731700000000,
+    };
+    const storage = memStorage();
+    storage.setItem(SAVE_KEY, JSON.stringify(old));
+    const { save } = loadSave(storage);
+    assert.equal(save.chapter, 4);
+    assert.equal(save.proofs.p202, true);
+    assert.equal(save.completed.ch3, true);
+    assert.deepEqual(save.badges, old.badges);
+    assert.equal(save.settings.reduceMotion, true);
+    assert.equal(save.settings.muted, false);
+    assert.equal(save.settings.music, 0.5);
+    assert.equal(save.settings.sfx, 0.8);
+    assert.equal(save.settings.proofMode, 'guided');
+    // Réécriture : même clé, même forme v1.
+    writeSave(save, storage);
+    const raw = JSON.parse(storage.getItem(SAVE_KEY));
+    assert.equal(raw.v, 1);
+    assert.equal(raw.proofs.p208, true);
+  });
+
+  it('les réglages (muet, volumes) survivent à un rechargement', () => {
+    const storage = memStorage();
+    let save = defaultSave();
+    save = { ...save, settings: { ...save.settings, muted: true, music: 0.2, sfx: 0, proofMode: 'free' } };
+    writeSave(save, storage);
+    const { save: back } = loadSave(storage);
+    assert.equal(back.settings.muted, true);
+    assert.equal(back.settings.music, 0.2);
+    assert.equal(back.settings.sfx, 0);
+    assert.equal(back.settings.proofMode, 'free');
+  });
+
+  it('nettoie des réglages abîmés', () => {
+    const m = migrateSave({ v: 1, settings: { muted: 'yes', music: 7, sfx: -1, proofMode: 'zzz' } });
+    assert.equal(m.settings.muted, false);
+    assert.equal(m.settings.music, 1);
+    assert.equal(m.settings.sfx, 0);
+    assert.equal(m.settings.proofMode, 'guided');
+  });
+
+  it('badges bonus : chaque théorème, mode libre, et les 6 nouveaux', async () => {
+    const { BONUS_PROOFS, PROOFS } = await import('../js/logic/proofs.js');
+    const { CORE_IDS, BONUS_IDS, markFreeSolve } = await import('../js/save.js');
+    assert.deepEqual(CORE_IDS, PROOFS.map((p) => p.id));
+    assert.deepEqual(BONUS_IDS, BONUS_PROOFS.map((p) => p.id));
+    let save = defaultSave();
+    save = markFreeSolve(save);
+    assert.ok(save.badges.includes('libre'));
+    for (const id of BONUS_IDS) save = markProofDone(save, id);
+    assert.ok(save.badges.includes('chercheuse'));
+    assert.ok(!save.badges.includes('logicienne'), 'logicienne reste pour les 6 preuves de LT');
+  });
+});

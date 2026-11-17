@@ -169,6 +169,7 @@ export function renderTree(model, { code } = {}) {
         ? `M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}`
         : `M${x1} ${y1} L${x2} ${y2}`);
       p.setAttribute('class', `edge edge-${kind}`);
+      p.dataset.to = b;
       svg.append(p);
     }
   }

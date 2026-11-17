@@ -1,31 +1,37 @@
-/* Service worker versionné — change CACHE pour invalider l’ancien cache. */
-const CACHE = 'lt-camille-v8';
+/* Service worker versionné — change CACHE (et les ?v=) pour invalider l’ancien cache. */
+const CACHE = 'lt-camille-v9';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=lt-camille-v8',
-  './js/main.js?v=lt-camille-v8',
-  './js/save.js',
-  './js/quiz.js',
-  './js/chapters.js',
-  './js/chapters/content.js',
-  './js/logic/formula.js',
-  './js/logic/engine.js',
-  './js/logic/proofs.js',
-  './js/proofplay.js',
-  './js/ui/art.js',
-  './js/ui/treeview.js',
+  './style.css?v=lt-camille-v9',
+  './js/main.js?v=lt-camille-v9',
+  './js/save.js?v=lt-camille-v9',
+  './js/quiz.js?v=lt-camille-v9',
+  './js/audio.js?v=lt-camille-v9',
+  './js/chapters.js?v=lt-camille-v9',
+  './js/chapters/content.js?v=lt-camille-v9',
+  './js/logic/formula.js?v=lt-camille-v9',
+  './js/logic/engine.js?v=lt-camille-v9',
+  './js/logic/proofs.js?v=lt-camille-v9',
+  './js/proofplay.js?v=lt-camille-v9',
+  './js/ui/art.js?v=lt-camille-v9',
+  './js/ui/assets.js?v=lt-camille-v9',
+  './js/ui/motion.js?v=lt-camille-v9',
+  './js/ui/treeview.js?v=lt-camille-v9',
+  './assets/audio/music-loop.mp3',
   './simple/index.html',
   './favicon.svg',
   './manifest.webmanifest',
+  // Illustrations peintes (partie A) : ajouter ici chaque ./assets/art/*.webp livré.
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
+      // cache: 'reload' → on contourne le cache HTTP pour ne pas précacher un vieux module.
       await Promise.all(
-        ASSETS.map((url) => cache.add(url).catch(() => undefined)),
+        ASSETS.map((url) => cache.add(new Request(url, { cache: 'reload' })).catch(() => undefined)),
       );
       await self.skipWaiting();
     })(),
@@ -43,11 +49,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
+  // Les requêtes partielles (Range, ex. audio) passent directement au réseau.
+  if (req.headers.has('range')) return;
   event.respondWith(
     caches.match(req).then((cached) => {
       const fetched = fetch(req)
         .then((res) => {
-          if (res && res.ok) {
+          if (res && res.ok && res.status === 200) {
             const copy = res.clone();
             caches.open(CACHE).then((cache) => cache.put(req, copy));
           }

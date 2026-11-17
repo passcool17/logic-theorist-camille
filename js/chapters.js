@@ -56,4 +56,12 @@ export const BADGE_INFO = {
   'proof-p206': { label: '*2.06', emoji: '✨', how: 'Chaîne' },
   'proof-p285': { label: '*2.85', emoji: '💎', how: 'La perle de LT' },
   logicienne: { label: 'Logicienne LT', emoji: '🤖', how: 'Les 6 preuves' },
+  libre: { label: 'Main libre', emoji: '🖐️', how: 'Une preuve trouvée en mode libre' },
+  'proof-p207': { label: '*2.07', emoji: '🌱', how: 'p ⊃ (p ∨ p)' },
+  'proof-p22': { label: '*2.2', emoji: '🌱', how: 'Ajouter un « ou »' },
+  'proof-p221': { label: '*2.21', emoji: '🌱', how: 'La promesse jamais brisée' },
+  'proof-p203': { label: '*2.03', emoji: '🌱', how: 'Dans les deux sens' },
+  'proof-p204': { label: '*2.04', emoji: '🌱', how: 'Échanger les « si »' },
+  'proof-p211': { label: '*2.11', emoji: '🌱', how: 'Tiers exclu' },
+  chercheuse: { label: 'Chercheuse *2', emoji: '🔬', how: 'Les 6 nouveaux théorèmes' },
 };

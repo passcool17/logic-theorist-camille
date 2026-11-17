@@ -147,7 +147,7 @@ export const PROOFS = [
     ],
     initialNotes: [
       'Déjà prouvé (*2.05) : (q ⊃ r) ⊃ ((p ⊃ q) ⊃ (p ⊃ r))',
-      'Lemme de permutation des antécédents (préparé pour toi)',
+      'Lemme de permutation des « si » (un cas de *2.04)',
     ],
     solution: [
       { rule: 'detachment', from: [1, 0], note: 'Modus ponens : détache *2.05 du lemme de permutation' },
@@ -161,27 +161,18 @@ export const PROOFS = [
     id: 'p285',
     code: '*2.85',
     title: 'La perle de LT',
-    blurb: 'LT a trouvé une preuve plus élégante que Russell & Whitehead ! Version accessible.',
-    goalDisplay: '(p ∨ q) ⊃ (~q ⊃ p)   [forme accessible de *2.85]',
-    // Forme accessible liée à *2.85 : (p∨q) ⊃ (¬q ⊃ p)
-    // Preuve :
-    // 0 A3: (p∨q)⊃(q∨p)
-    // 1 subst A3 → (p∨q)⊃(q∨p)  (déjà)
-    // Mieux :
-    // 0. A3: (p∨q)⊃(q∨p)
-    // 1. Lemme: (q∨p) ⊃ (¬q ⊃ p)   car q∨p = ¬¬q∨p … 
-    //    Avec déf : ¬q ⊃ p = ~~q ∨ p — on utilise lemme pédagogique :
-    // 0 A3
-    // 1 L: (q∨p) ⊃ (~q|p)  — si on identifie ~q|p avec implication; q∨p vs ~(~q)|p
-    // Simplification éducative correcte :
-    // But: (p|q)>(~q|p)
-    // 0: A3 (p|q)>(q|p)
-    // 1: lemme (q|p)>(~q|p)  — « si q ou p, alors si non-q alors p » (tautologie préparée)
-    // 2: chain
-    goal: parse('(p|q)>(~q|p)'),
+    blurb: 'LT a trouvé une preuve de *2.85 plus élégante que celle de Russell et Whitehead ! Ici, un défi inspiré de cette perle.',
+    goalDisplay: '(p ∨ q) ⊃ (¬q ⊃ p)   [défi inspiré de *2.85]',
+    // Le vrai *2.85 est ((p ∨ q) ⊃ (p ∨ r)) ⊃ (p ∨ (q ⊃ r)) ; ce défi en garde l’esprit
+    // (un raccourci élégant). Ici ¬q ⊃ p s’écrit ¬¬q ∨ p (définition *1.01 : a ⊃ b = ¬a ∨ b).
+    // v9 : l’ancien codage « ¬q ∨ p » n’était pas une tautologie ; corrigé en ¬¬q ∨ p.
+    // 0: A3 (p∨q) ⊃ (q∨p)
+    // 1: lemme (q∨p) ⊃ (¬¬q ∨ p) — « si q ou p, alors si non-q, p » (tautologie préparée)
+    // 2: Raccourci (0)(1)
+    goal: parse('(p|q)>(~~q|p)'),
     initials: [
       AXIOMS.A3,
-      parse('(q|p)>(~q|p)'),
+      parse('(q|p)>(~~q|p)'),
     ],
     initialNotes: [
       'Axiome *1.4  (p ∨ q) ⊃ (q ∨ p)',
@@ -197,10 +188,133 @@ export const PROOFS = [
   },
 ];
 
+/**
+ * Six nouveaux théorèmes du chapitre *2 des Principia (v9, atelier libre).
+ * Énoncés vérifiés le 2026-11-16 sur Metamath (set.mm, réf. [WhiteheadRussell]) :
+ * pm2.07 (*2.07, p. 101), orc (*2.2, p. 104), pm2.21 (*2.21, p. 104),
+ * con2 (*2.03, p. 100), pm2.04 (*2.04, p. 100), exmid (*2.11, p. 101), pm2.1 (*2.1, p. 101).
+ * Comme dans les Principia (*1.01), « a ⊃ b » à l’intérieur s’écrit ¬a ∨ b pour le moteur.
+ * Chaque preuve est courte et réelle : substitutions dans *1.3, *1.4, *1.5, raccourci, modus ponens.
+ */
+export const BONUS_PROOFS = [
+  {
+    id: 'p207',
+    code: '*2.07',
+    title: 'p ⊃ (p ∨ p)',
+    goalDisplay: 'p ⊃ (p ∨ p)',
+    blurb: 'Dire deux fois la même chose ne change rien.',
+    kid: 'Si une chose est vraie, alors « elle OU elle » est vraie aussi. « Il fait beau ou il fait beau », c’est juste… il fait beau !',
+    source: 'Principia *2.07 (p. 101), vérifié sur Metamath (pm2.07)',
+    goal: parse('p>(p|p)'),
+    initials: [AXIOMS.A2],
+    initialNotes: ['Axiome *1.3  q ⊃ (p ∨ q)'],
+    solution: [
+      { rule: 'substitution', from: [0], subst: { q: parse('p') }, note: 'Dans *1.3, remplace q par p : p ⊃ (p ∨ p).' },
+    ],
+    hints: ['Une seule substitution dans *1.3 suffit : remplace q par p.'],
+  },
+  {
+    id: 'p22',
+    code: '*2.2',
+    title: 'p ⊃ (p ∨ q)',
+    goalDisplay: 'p ⊃ (p ∨ q)',
+    blurb: 'Si p est vrai, « p ou q » est vrai.',
+    kid: 'S’il pleut, alors « il pleut ou il neige » est vrai, peu importe la neige. Ajouter un « ou » ne peut pas rendre faux ce qui est vrai.',
+    source: 'Principia *2.2 (p. 104), vérifié sur Metamath (orc)',
+    goal: parse('p>(p|q)'),
+    initials: [AXIOMS.A2, AXIOMS.A3],
+    initialNotes: ['Axiome *1.3  q ⊃ (p ∨ q)', 'Axiome *1.4  (p ∨ q) ⊃ (q ∨ p)'],
+    solution: [
+      { rule: 'substitution', from: [0], subst: { q: parse('p'), p: parse('q') }, note: 'Dans *1.3, échange les lettres : p ⊃ (q ∨ p).' },
+      { rule: 'substitution', from: [1], subst: { p: parse('q'), q: parse('p') }, note: 'Dans *1.4, échange aussi : (q ∨ p) ⊃ (p ∨ q).' },
+      { rule: 'chain', from: [2, 3], note: 'Raccourci : p ⊃ (q ∨ p) et (q ∨ p) ⊃ (p ∨ q) donnent p ⊃ (p ∨ q).' },
+    ],
+    hints: [
+      'Dans *1.3, mets q:=p et p:=q pour obtenir p ⊃ (q ∨ p).',
+      'Dans *1.4, mets p:=q et q:=p pour retourner q ∨ p en p ∨ q.',
+      'Enchaîne les deux flèches avec le Raccourci.',
+    ],
+  },
+  {
+    id: 'p221',
+    code: '*2.21',
+    title: '¬p ⊃ (p ⊃ q)',
+    goalDisplay: '¬p ⊃ (p ⊃ q)',
+    blurb: 'Une promesse sur une chose fausse ne peut pas être brisée.',
+    kid: 'Si p est faux, alors « si p, alors q » est vrai, peu importe q. « Si les cochons volent, je range ma chambre » : comme les cochons ne volent pas, la promesse n’est jamais brisée !',
+    source: 'Principia *2.21 (p. 104), vérifié sur Metamath (pm2.21)',
+    goal: parse('~p>(~p|q)'),
+    initials: [parse('p>(p|q)')],
+    initialNotes: ['Déjà prouvé (*2.2)  p ⊃ (p ∨ q)'],
+    solution: [
+      { rule: 'substitution', from: [0], subst: { p: parse('~p') }, note: 'Remplace p par ¬p : ¬p ⊃ (¬p ∨ q), c’est-à-dire ¬p ⊃ (p ⊃ q).' },
+    ],
+    hints: ['Pars de *2.2 et remplace p par ¬p. Rappel : ¬p ∨ q veut dire p ⊃ q.'],
+  },
+  {
+    id: 'p203',
+    code: '*2.03',
+    title: '(p ⊃ ¬q) ⊃ (q ⊃ ¬p)',
+    goalDisplay: '(p ⊃ ¬q) ⊃ (q ⊃ ¬p)',
+    blurb: 'Si p empêche q, alors q empêche p.',
+    kid: 'Si « je dors » empêche « je parle », alors « je parle » empêche « je dors ». Quand deux choses ne peuvent pas aller ensemble, ça marche dans les deux sens.',
+    source: 'Principia *2.03 (p. 100), vérifié sur Metamath (con2)',
+    goal: parse('(~p|~q)>(~q|~p)'),
+    initials: [AXIOMS.A3],
+    initialNotes: ['Axiome *1.4  (p ∨ q) ⊃ (q ∨ p)'],
+    solution: [
+      { rule: 'substitution', from: [0], subst: { p: parse('~p'), q: parse('~q') }, note: 'Dans *1.4, mets ¬p et ¬q : (¬p ∨ ¬q) ⊃ (¬q ∨ ¬p).' },
+    ],
+    hints: ['Dans *1.4, remplace p par ¬p et q par ¬q. Rappel : ¬p ∨ ¬q veut dire p ⊃ ¬q.'],
+  },
+  {
+    id: 'p204',
+    code: '*2.04',
+    title: '[p ⊃ (q ⊃ r)] ⊃ [q ⊃ (p ⊃ r)]',
+    goalDisplay: '[p ⊃ (q ⊃ r)] ⊃ [q ⊃ (p ⊃ r)]',
+    blurb: 'L’ordre des conditions ne compte pas.',
+    kid: '« Si j’ai faim, alors si c’est midi, je mange » veut dire la même chose que « si c’est midi, alors si j’ai faim, je mange ». On peut échanger les deux « si ».',
+    source: 'Principia *2.04 (p. 100), vérifié sur Metamath (pm2.04)',
+    goal: parse('(~p|(~q|r))>(~q|(~p|r))'),
+    initials: [AXIOMS.A4],
+    initialNotes: ['Axiome *1.5  [p ∨ (q ∨ r)] ⊃ [q ∨ (p ∨ r)]'],
+    solution: [
+      { rule: 'substitution', from: [0], subst: { p: parse('~p'), q: parse('~q') }, note: 'Dans *1.5, mets ¬p et ¬q : chaque « ¬a ∨ … » devient « a ⊃ … ».' },
+    ],
+    hints: ['Dans *1.5, remplace p par ¬p et q par ¬q (r ne bouge pas).'],
+  },
+  {
+    id: 'p211',
+    code: '*2.11',
+    title: 'p ∨ ¬p  (tiers exclu)',
+    goalDisplay: 'p ∨ ¬p',
+    blurb: 'Vrai ou faux : pas de troisième choix.',
+    kid: 'Une phrase est vraie ou elle est fausse, il n’y a pas de troisième possibilité. « Il pleut ou il ne pleut pas » est toujours vrai.',
+    source: 'Principia *2.11 (p. 101), vérifié sur Metamath (exmid, pm2.1)',
+    goal: parse('p|~p'),
+    initials: [AXIOMS.A3, parse('~p|p')],
+    initialNotes: ['Axiome *1.4  (p ∨ q) ⊃ (q ∨ p)', 'Déjà prouvé (*2.1)  ¬p ∨ p'],
+    solution: [
+      { rule: 'substitution', from: [0], subst: { p: parse('~p'), q: parse('p') }, note: 'Dans *1.4, mets ¬p puis p : (¬p ∨ p) ⊃ (p ∨ ¬p).' },
+      { rule: 'detachment', from: [2, 1], note: 'Modus ponens : tu as ¬p ∨ p, donc p ∨ ¬p.' },
+    ],
+    hints: [
+      'Dans *1.4, remplace p par ¬p et q par p.',
+      'Tu as maintenant « A ⊃ B » et A (c’est *2.1) : Modus ponens !',
+    ],
+  },
+];
+
+export const ALL_PROOFS = [...PROOFS, ...BONUS_PROOFS];
+
+export function findProof(id) {
+  return ALL_PROOFS.find((p) => p.id === id) || null;
+}
+
 /** Vérifie que chaque preuve fournie est acceptée par le moteur. */
 export function allProofsSound() {
   const report = [];
-  for (const p of PROOFS) {
+  for (const p of ALL_PROOFS) {
     const result = checkProof(p.initials, p.solution, p.goal);
     report.push({ id: p.id, code: p.code, ok: result.ok, error: result.error || null });
   }
