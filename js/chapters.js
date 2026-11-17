@@ -54,7 +54,7 @@ export const BADGE_INFO = {
   'proof-p201': { label: '*2.01', emoji: '✨', how: 'Réduction' },
   'proof-p205': { label: '*2.05', emoji: '✨', how: 'Syllogisme' },
   'proof-p206': { label: '*2.06', emoji: '✨', how: 'Chaîne' },
-  'proof-p285': { label: '*2.85', emoji: '💎', how: 'La perle de LT' },
+  'proof-p285': { label: 'Défi inspiré de *2.85', emoji: '💎', how: 'La perle de LT' },
   logicienne: { label: 'Logicienne LT', emoji: '🤖', how: 'Les 6 preuves' },
   libre: { label: 'Main libre', emoji: '🖐️', how: 'Une preuve trouvée en mode libre' },
   'proof-p207': { label: '*2.07', emoji: '🌱', how: 'p ⊃ (p ∨ p)' },

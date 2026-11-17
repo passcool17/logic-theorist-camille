@@ -4,7 +4,7 @@
 Camille (13 ans) apprend Logic Theorist en cinq chapitres calmes. Le chapitre 4 est un atelier de preuves avec JOHNNIAC, un arbre de recherche et des tuiles de règles (visuel aligné sur la maquette de Pascal, nov. 2026).
 
 ## Version publiée
-**v9** (`lt-camille-v9`, nov. 2026) — 2D seule à la racine. La campus 3D a été retirée le 2026-11-09 ; son code reste dans l’historique git et sur `feat/lt-3d`. `/simple/` redirige vers la racine.
+**v10** (`lt-camille-v10`, nov. 2026) — corrections QA v9 : défi « inspiré de *2.85 » nommé sur la carte, l’arbre et le badge ; boutons du bandeau 44×44 px ; titre long sur 2 lignes au besoin. Base v9 : 2D seule à la racine. La campus 3D a été retirée le 2026-11-09 ; son code reste dans l’historique git et sur `feat/lt-3d`. `/simple/` redirige vers la racine.
 
 Nouveau en v9 (parties B et C approuvées par Pascal le 2026-11-16) :
 - **Son** : musique douce en boucle + petits sons (toucher, choix, étape réussie, preuve trouvée, essai raté, page). Rien ne joue avant le premier toucher. Bouton haut-parleur (coupe / remet le son, touche **M**), réglages Musique / Effets / Moins d’animations dans l’écran ⚙ « Réglages et à propos ». Tout est sauvegardé.
@@ -52,8 +52,8 @@ lt.camille.v1 = {
 Clé et `v: 1` inchangées. Les vieilles saves (sans les nouveaux réglages) reçoivent les valeurs par défaut (`normalizeSettings`, test de migration dans `tests/save.test.js`). Les saves `v: 2` (ère 3D) restent acceptées. Badges ajoutés : `proof-p207`…`proof-p211`, `libre` (une preuve en mode libre), `chercheuse` (les 6 bonus). `logicienne` reste lié aux 6 preuves de LT.
 
 ## Version / cache
-- `APP_VERSION` (js/main.js), `CACHE` (sw.js) et tous les `?v=` = **`lt-camille-v9`**.
-- Les modules sont versionnés par l’**import map** de `index.html` (chaque `./js/…js` → `…js?v=lt-camille-v9`) : à chaque livraison, remplacer la version partout (index.html, sw.js, main.js). Un test vérifie que les trois sont alignés et que chaque module est dans l’import map et le précache.
+- `APP_VERSION` (js/main.js), `CACHE` (sw.js) et tous les `?v=` = **`lt-camille-v10`**.
+- Les modules sont versionnés par l’**import map** de `index.html` (chaque `./js/…js` → `…js?v=lt-camille-v10`) : à chaque livraison, remplacer la version partout (index.html, sw.js, main.js). Un test vérifie que les trois sont alignés et que chaque module est dans l’import map et le précache.
 - Le SW précache avec `cache: 'reload'` (évite de précacher un vieux module du cache HTTP) et laisse passer les requêtes `Range`.
 
 ## Illustrations (partie A — livrées par Atelier assets, intégrées en v9)

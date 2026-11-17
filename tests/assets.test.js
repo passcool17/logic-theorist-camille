@@ -55,7 +55,7 @@ describe('illustrations et sons', () => {
     const cache = sw.match(/const CACHE = '([^']+)'/)[1];
     const html = readFileSync(new URL('index.html', root), 'utf8');
     const main = readFileSync(new URL('js/main.js', root), 'utf8');
-    assert.equal(cache, 'lt-camille-v9');
+    assert.equal(cache, 'lt-camille-v10');
     assert.ok(main.includes(`const APP_VERSION = '${cache}'`));
     for (const m of html.matchAll(/\?v=([\w-]+)/g)) assert.equal(m[1], cache);
     for (const m of sw.matchAll(/\?v=([\w-]+)/g)) assert.equal(m[1], cache);
@@ -69,7 +69,7 @@ describe('illustrations et sons', () => {
       .map((f) => `./js/${f.split('\\').join('/')}`);
     assert.ok(files.length >= 14);
     for (const f of files) {
-      const versioned = `${f}?v=lt-camille-v9`;
+      const versioned = `${f}?v=lt-camille-v10`;
       assert.ok(sw.includes(`'${versioned}'`), `sw.js : ${versioned}`);
       if (!f.endsWith('/main.js')) assert.equal(map[f], versioned, `import map : ${f}`);
     }

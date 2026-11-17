@@ -160,6 +160,7 @@ export const PROOFS = [
   {
     id: 'p285',
     code: '*2.85',
+    inspiredBy: '*2.85', // QA v9 : ce n’est pas le vrai *2.85 → le dire partout (carte, arbre, badge)
     title: 'La perle de LT',
     blurb: 'LT a trouvé une preuve de *2.85 plus élégante que celle de Russell et Whitehead ! Ici, un défi inspiré de cette perle.',
     goalDisplay: '(p ∨ q) ⊃ (¬q ⊃ p)   [défi inspiré de *2.85]',
@@ -337,3 +338,13 @@ export function applySolutionStep(proof, lines, stepIndex) {
 }
 
 export { pretty, eq, parse, checkProof };
+
+/** Titre de carte : un défi « inspiré » le dit tout de suite (QA v9 bug 1). */
+export function proofCardTitle(p) {
+  return p.inspiredBy ? `Défi inspiré de ${p.inspiredBy}` : p.title;
+}
+
+/** En-tête au-dessus du but dans l’arbre. */
+export function proofHeading(p) {
+  return p.inspiredBy ? `Défi inspiré de ${p.inspiredBy}` : `Preuve ${p.code}`;
+}

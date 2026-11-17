@@ -37,4 +37,4 @@ Code et textes originaux de ce jeu. **Ne copie pas** `dmoews/logic-theorist` ni 
 
 ## Sauvegarde
 
-`localStorage` clé `lt.camille.v1` (progression conservée ; réglages son / animations / mode ajoutés en v9 avec valeurs par défaut ; les saves v2 de l’ère 3D sont migrées). PWA avec service worker versionné (`lt-camille-v9`) et modules versionnés par import map.
+`localStorage` clé `lt.camille.v1` (progression conservée ; réglages son / animations / mode ajoutés en v9 avec valeurs par défaut ; les saves v2 de l’ère 3D sont migrées). PWA avec service worker versionné (`lt-camille-v10`) et modules versionnés par import map.

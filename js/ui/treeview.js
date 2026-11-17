@@ -104,7 +104,7 @@ function edges(n, out = []) {
 }
 
 /** Construit l’arbre ; retourne l’élément et une fonction qui (re)trace les traits. */
-export function renderTree(model, { code } = {}) {
+export function renderTree(model, { heading, code } = {}) {
   const root = document.createElement('div');
   root.className = `proof-tree${model.solved ? ' solved' : ''}`;
   root.setAttribute('aria-label', 'Arbre de preuve');
@@ -112,7 +112,7 @@ export function renderTree(model, { code } = {}) {
   const target = document.createElement('div');
   target.className = 'tn-target-row';
   target.innerHTML = `${laurelSVG('left')}<div class="tn tn-target" data-key="goal"><span class="tn-code"></span><span class="tn-f"></span></div>${laurelSVG('right')}`;
-  target.querySelector('.tn-code').textContent = code ? `Preuve ${code}` : 'But';
+  target.querySelector('.tn-code').textContent = heading || (code ? `Preuve ${code}` : 'But');
   const goalF = target.querySelector('.tn-f');
   for (const part of breakLines(model.goal, 16)) {
     const line = document.createElement('span');

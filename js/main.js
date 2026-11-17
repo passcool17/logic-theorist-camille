@@ -6,7 +6,7 @@
 
 import { CHAPTERS, BADGE_INFO } from './chapters.js';
 import { CH1, CH2, CH3, CH5 } from './chapters/content.js';
-import { PROOFS, BONUS_PROOFS, findProof, pretty } from './logic/proofs.js';
+import { PROOFS, BONUS_PROOFS, findProof, pretty, proofCardTitle, proofHeading } from './logic/proofs.js';
 import { RULE_LABELS, tryRule } from './logic/engine.js';
 import { parse } from './logic/formula.js';
 import {
@@ -44,7 +44,7 @@ import { renderTree } from './ui/treeview.js';
 import { installAudioLifecycle, configureAudio, sfx, audioState } from './audio.js';
 import * as motion from './ui/motion.js';
 
-const APP_VERSION = 'lt-camille-v9';
+const APP_VERSION = 'lt-camille-v10';
 const RULES = ['substitution', 'detachment', 'chain'];
 
 let state = {
@@ -479,7 +479,7 @@ function proofCard(p, idx, list) {
   }, [
     el('span', { className: 'code-pill', text: p.code }),
     el('span', { className: 'chap-text' }, [
-      el('strong', { className: 'math', text: p.title }),
+      el('strong', { className: 'math', text: proofCardTitle(p) }),
       el('span', { className: 'meta', text: done ? 'prouvée ✓' : p.blurb.length > 64 ? p.blurb.slice(0, 62) + '…' : p.blurb }),
     ]),
     el('span', { className: `chap-status${done ? ' ok' : ''}`, text: done ? '✓' : !prevOk ? '🔒' : '→', 'aria-label': done ? 'prouvée' : !prevOk ? 'verrouillée' : 'ouvrir' }),
@@ -496,7 +496,7 @@ function renderCh4Hub(root) {
         el('h2', { text: 'Prouve comme LT' }),
         el('p', {
           className: 'story',
-          text: 'Six petites preuves des Principia, de plus en plus costaudes. Mode guidé : tu choisis la règle. Mode libre : tu choisis aussi les lignes !',
+          text: 'Cinq petites preuves des Principia, puis un défi inspiré de *2.85, de plus en plus costauds. Mode guidé : tu choisis la règle. Mode libre : tu choisis aussi les lignes !',
         }),
       ]),
     ]),
@@ -593,7 +593,7 @@ function renderProof(root) {
   const model = buildTree(proof, state.proofLines, state.proofRejects, 2);
   const goalText = (proof.goalDisplay || pretty(proof.goal)).replace(/\s*\[.*\]\s*$/, '');
   model.goal = goalText;
-  const tv = renderTree(model, { code: proof.code });
+  const tv = renderTree(model, { heading: proofHeading(proof) });
   redrawTree = tv.draw;
   const nInit = proof.initials.length;
   const stepNow = state.proofLines.length - nInit;
@@ -627,7 +627,7 @@ function renderProof(root) {
 
 function kidCard(proof) {
   return el('section', { className: 'card kid-card' }, [
-    el('p', { className: 'eyebrow', text: `${proof.code} en mots simples` }),
+    el('p', { className: 'eyebrow', text: `${proof.inspiredBy ? proofHeading(proof) : proof.code} en mots simples` }),
     el('p', { className: 'story', text: proof.kid }),
     proof.source ? el('p', { className: 'meta', text: `Source : ${proof.source}.` }) : null,
   ]);

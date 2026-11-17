@@ -795,3 +795,21 @@ html.rm *, html.rm *::before, html.rm *::after { animation-duration: .01ms !impo
   .page-card:has(> .chapter-banner) { display: grid; grid-template-columns: minmax(220px, 38%) 1fr; column-gap: 16px; align-items: start; }
   .page-card > .chapter-banner { grid-row: 1 / span 20; margin: 0; aspect-ratio: 4 / 3; }
 }
+
+/* v10 (QA v9 bugs 2-3) : cibles du bandeau >= 44 px ; titre long sur 2 lignes au lieu d’être coupé. */
+.topbar { gap: 6px; }
+.back-btn, .logo { width: 44px; height: 44px; }
+.about-btn, .sound-btn { width: 44px; height: 44px; }
+.ribbon { width: 44px; height: 50px; }
+.ribbon-svg { margin: 0 auto; }
+.top-title {
+  min-width: 0;
+  font-size: clamp(.95rem, 3.6vw, 1.08rem);
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
